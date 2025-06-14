@@ -2,6 +2,7 @@ const CACHE_NAME = 'sc-seclab-v1';
 const urlsToCache = [
   '/sc-seclab/',
   '/sc-seclab/index.html',
+  '/sc-seclab/usage.html',
   '/sc-seclab/manifest.json',
   '/sc-seclab/images/ogp-image.jpg'
 ];
