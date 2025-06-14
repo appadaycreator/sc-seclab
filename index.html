@@ -173,6 +173,9 @@
                     <button class="btn-primary px-4 py-2 rounded-lg text-white font-semibold" onclick="showSettings()">
                         <i class="fas fa-cog mr-2"></i>設定
                     </button>
+                    <button class="btn-primary px-4 py-2 rounded-lg text-white font-semibold" onclick="showHelp()">
+                        <i class="fas fa-question-circle mr-2"></i>ヘルプ
+                    </button>
                     <select id="font-size-selector" class="bg-gray-800 text-white rounded px-2 py-1" onchange="changeFontSize(this.value)">
                         <option value="12">極小</option>
                         <option value="14">小</option>
@@ -427,7 +430,7 @@
                         <i class="fas fa-exclamation-triangle mr-3 text-red-400"></i>
                         弱点分析
                     </h2>
-                    <canvas id="weakness-chart" style="height: 300px;"></canvas>
+                    <canvas id="weakness-chart" style="height: 250px; max-width: 100%;"></canvas>
                 </div>
 
                 <div class="glassmorphism rounded-xl p-6">
@@ -1011,7 +1014,7 @@
                     },
                     options: {
                         responsive: true,
-                        maintainAspectRatio: false,
+                        maintainAspectRatio: true,
                         plugins: {
                             legend: {
                                 labels: { color: '#e1e8ed' }
@@ -1249,6 +1252,11 @@
 
             document.getElementById('settings-modal').classList.remove('hidden');
             document.getElementById('settings-modal').classList.add('flex');
+        }
+
+        function showHelp() {
+            const msg = 'まず「設定」ボタンから試験日・学習時間・レベルを入力しましょう。';
+            showNotification(msg, 'info');
         }
 
         function closeSettings() {
