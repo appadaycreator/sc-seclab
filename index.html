@@ -183,9 +183,9 @@
                     <button class="btn-primary px-4 py-2 rounded-lg text-white font-semibold" onclick="showSettings()">
                         <i class="fas fa-cog mr-2"></i>設定
                     </button>
-                    <button class="btn-primary px-4 py-2 rounded-lg text-white font-semibold" onclick="showHelp()">
+                    <a href="usage.html" class="btn-primary px-4 py-2 rounded-lg text-white font-semibold">
                         <i class="fas fa-question-circle mr-2"></i>ヘルプ
-                    </button>
+                    </a>
                     <select id="font-size-selector" class="bg-gray-800 text-white rounded px-2 py-1" onchange="changeFontSize(this.value)">
                         <option value="12">極小</option>
                         <option value="14">小</option>
@@ -200,7 +200,34 @@
                 </div>
             </div>
         </div>
-    </header>
+</header>
+
+    <!-- 3-Step Guide -->
+    <section id="guide" class="container mx-auto px-4 mt-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+            <div class="p-4 bg-gray-800 rounded-lg">
+                <h2 class="text-xl font-bold mb-2">STEP 1</h2>
+                <p class="mb-3">試験日とレベルを設定</p>
+                <button class="btn-primary px-4 py-2 rounded-lg" onclick="showSettings()">設定へ</button>
+            </div>
+            <div class="p-4 bg-gray-800 rounded-lg">
+                <h2 class="text-xl font-bold mb-2">STEP 2</h2>
+                <p class="mb-3">あなただけの学習プランを確認</p>
+                <button class="btn-primary px-4 py-2 rounded-lg" onclick="showTab('plan')">プランを見る</button>
+            </div>
+            <div class="p-4 bg-gray-800 rounded-lg">
+                <h2 class="text-xl font-bold mb-2">STEP 3</h2>
+                <p class="mb-3">今日のタスクに挑戦！</p>
+                <button class="btn-primary px-4 py-2 rounded-lg" onclick="showTab('dashboard')">学習開始</button>
+            </div>
+        </div>
+        <div class="text-center mt-6">
+            <button class="btn-primary px-8 py-3 rounded-lg text-lg font-semibold" onclick="showSettings()">まずは無料で始める</button>
+        </div>
+        <div class="mt-8 flex justify-center">
+            <iframe class="w-full h-64 md:h-80 rounded-lg" src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="SC-SecLab デモ" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+    </section>
 
     <!-- Navigation Tabs -->
     <nav class="container mx-auto px-4 mt-6">
@@ -300,13 +327,13 @@
                     <div class="glassmorphism rounded-xl p-6">
                         <h3 class="text-lg font-bold mb-4">クイックアクション</h3>
                         <div class="space-y-3">
-                            <button class="w-full btn-primary py-3 rounded-lg font-semibold" onclick="startStudySession()">
+                            <button class="w-full btn-primary py-3 rounded-lg font-semibold" title="学習タイマーを開始" onclick="startStudySession()">
                                 <i class="fas fa-play mr-2"></i>学習開始
                             </button>
-                            <button class="w-full bg-gray-700 hover:bg-gray-600 py-3 rounded-lg font-semibold transition-colors" onclick="takePracticeTest()">
+                            <button class="w-full bg-gray-700 hover:bg-gray-600 py-3 rounded-lg font-semibold transition-colors" title="ランダムに過去問を出題" onclick="takePracticeTest()">
                                 <i class="fas fa-pen mr-2"></i>過去問チャレンジ
                             </button>
-                            <button class="w-full bg-gray-700 hover:bg-gray-600 py-3 rounded-lg font-semibold transition-colors" onclick="reviewWeakAreas()">
+                            <button class="w-full bg-gray-700 hover:bg-gray-600 py-3 rounded-lg font-semibold transition-colors" title="苦手分野を復習" onclick="reviewWeakAreas()">
                                 <i class="fas fa-exclamation-triangle mr-2"></i>弱点復習
                             </button>
                         </div>
@@ -647,7 +674,7 @@
                     <ul class="text-sm text-gray-400 space-y-1">
                         <li><a href="#" onclick="showPrivacyPolicy()">プライバシーポリシー</a></li>
                         <li><a href="#" onclick="showTerms()">利用規約</a></li>
-                        <li><a href="#" onclick="showUsage()">使い方</a></li>
+                        <li><a href="usage.html">使い方</a></li>
                         <li><a href="#" onclick="showContact()">お問い合わせ</a></li>
                         <li><a href="https://www.sc-siken.com/sc/" target="_blank">道場サイト</a></li>
                     </ul>
