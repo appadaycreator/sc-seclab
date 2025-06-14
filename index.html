@@ -116,6 +116,18 @@
             color: white;
         }
 
+        .fixed-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 50;
+        }
+
+        body {
+            padding-top: 120px;
+        }
+
         /* Adjustments for small screens can be added here */
     </style>
 </head>
@@ -125,7 +137,7 @@
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     
     <!-- Header -->
-    <header class="glassmorphism shadow-lg">
+    <header class="glassmorphism shadow-lg fixed-header">
         <div class="container mx-auto px-4 py-4">
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-3">
@@ -143,6 +155,11 @@
                     <button class="btn-primary px-4 py-2 rounded-lg text-white font-semibold" onclick="showSettings()">
                         <i class="fas fa-cog mr-2"></i>設定
                     </button>
+                    <select id="font-size-selector" class="bg-gray-800 text-white rounded px-2 py-1" onchange="changeFontSize(this.value)">
+                        <option value="16">標準</option>
+                        <option value="18">大</option>
+                        <option value="20">特大</option>
+                    </select>
                 </div>
             </div>
         </div>
@@ -619,12 +636,18 @@
                 defaultDate.setMonth(defaultDate.getMonth() + 3);
                 studyData.examDate = defaultDate.toISOString().split('T')[0];
             }
-            
+
             // Update UI elements
             document.getElementById('exam-date').value = studyData.examDate;
             document.getElementById('daily-hours').value = studyData.dailyHours;
             document.getElementById('current-level').value = studyData.currentLevel;
-            
+
+            const savedSize = localStorage.getItem('fontSize');
+            if (savedSize) {
+                changeFontSize(savedSize);
+                document.getElementById('font-size-selector').value = savedSize;
+            }
+
             saveData();
         }
 
@@ -1287,6 +1310,11 @@ https://appadaycreator.github.io/sc-seclab
                     });
                 }
             }, delay);
+        }
+
+        function changeFontSize(size) {
+            document.documentElement.style.fontSize = size + 'px';
+            localStorage.setItem('fontSize', size);
         }
 
         // Auto-save functionality
