@@ -162,6 +162,13 @@
                         <option value="18">大</option>
                         <option value="20">特大</option>
                     </select>
+                    <select id="header-font-size-selector" class="bg-gray-800 text-white rounded px-2 py-1" onchange="changeHeaderFontSize(this.value)">
+                        <option value="12">極小</option>
+                        <option value="14">小</option>
+                        <option value="16">標準</option>
+                        <option value="18">大</option>
+                        <option value="20">特大</option>
+                    </select>
                 </div>
             </div>
         </div>
@@ -649,6 +656,12 @@
             if (savedSize) {
                 changeFontSize(savedSize);
                 document.getElementById('font-size-selector').value = savedSize;
+            }
+
+            const savedHeaderSize = localStorage.getItem('headerFontSize');
+            if (savedHeaderSize) {
+                changeHeaderFontSize(savedHeaderSize);
+                document.getElementById('header-font-size-selector').value = savedHeaderSize;
             }
 
             saveData();
@@ -1323,6 +1336,14 @@ https://appadaycreator.github.io/sc-seclab
         function changeFontSize(size) {
             document.documentElement.style.fontSize = size + 'px';
             localStorage.setItem('fontSize', size);
+        }
+
+        function changeHeaderFontSize(size) {
+            const title = document.querySelector('header h1');
+            const subtitle = document.querySelector('header p');
+            if (title) title.style.fontSize = size + 'px';
+            if (subtitle) subtitle.style.fontSize = (size - 2) + 'px';
+            localStorage.setItem('headerFontSize', size);
         }
 
         // Auto-save functionality
