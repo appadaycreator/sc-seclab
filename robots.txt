@@ -1,3 +1,4 @@
 User-agent: *
 Allow: /
-Sitemap: https://sc-seclab.com/sitemap.xml 
+
+Sitemap: https://appadaycreator.github.io/sc-seclab/sitemap.xml
