@@ -108,6 +108,16 @@
             background: rgba(255, 255, 255, 0.8);
             border: 1px solid rgba(0, 0, 0, 0.1);
         }
+
+        /* Improve text visibility in light theme */
+        body.theme-light .text-gray-400,
+        body.theme-light .text-gray-600 {
+            color: #555555;
+        }
+
+        body.theme-light .text-gray-300 {
+            color: #666666;
+        }
         
         .notification {
             animation: slideIn 0.3s ease;
@@ -394,6 +404,7 @@
                         <div class="mb-6" id="question-container">
                             <div class="bg-gray-800 p-6 rounded-lg mb-4">
                                 <h3 class="font-bold mb-3">問題 <span id="question-number">1</span>/<span id="question-total">3</span></h3>
+                                <div class="text-sm text-gray-400 mb-2" id="question-meta"></div>
                                 <p class="mb-4" id="question-text"></p>
                                 <div class="space-y-2" id="question-options"></div>
                                 <div class="flex justify-between mt-4">
@@ -657,16 +668,22 @@
         let currentDate = new Date();
         const practiceQuestions = [
             {
+                year: '2023年春期',
+                number: 1,
                 text: '情報セキュリティマネジメントシステム(ISMS)の確立において、最も重要な要素はどれか。',
                 options: ['A. 最新の技術を導入すること', 'B. 経営陣のコミットメント', 'C. セキュリティソフトの導入', 'D. 従業員の増員'],
                 correct: 'B'
             },
             {
+                year: '2023年春期',
+                number: 2,
                 text: '公開鍵暗号方式の特徴はどれか。',
                 options: ['A. 同じ鍵で暗号化と復号を行う', 'B. 鍵配送が不要である', 'C. 暗号化に秘密鍵を用いる', 'D. 復号には公開鍵を用いる'],
                 correct: 'B'
             },
             {
+                year: '2023年春期',
+                number: 3,
                 text: 'ファイアウォールの主な目的はどれか。',
                 options: ['A. システムの性能向上', 'B. ネットワークの負荷分散', 'C. 外部からの不正アクセス防止', 'D. データ圧縮'],
                 correct: 'C'
@@ -952,6 +969,7 @@
             const question = practiceQuestions[currentQuestionIndex];
             document.getElementById('question-number').textContent = currentQuestionIndex + 1;
             document.getElementById('question-total').textContent = practiceQuestions.length;
+            document.getElementById('question-meta').textContent = `${question.year} 第${question.number}問`;
             document.getElementById('question-text').textContent = question.text;
 
             const optionsContainer = document.getElementById('question-options');
