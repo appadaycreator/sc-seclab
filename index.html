@@ -186,6 +186,9 @@
                     <a href="usage.html" class="btn-primary px-4 py-2 rounded-lg text-white font-semibold">
                         <i class="fas fa-question-circle mr-2"></i>ヘルプ
                     </a>
+                    <button class="btn-primary px-4 py-2 rounded-lg text-white font-semibold" onclick="showGuide()">
+                        <i class="fas fa-map-signs mr-2"></i>ガイド
+                    </button>
                     <select id="font-size-selector" class="bg-gray-800 text-white rounded px-2 py-1" onchange="changeFontSize(this.value)">
                         <option value="12">極小</option>
                         <option value="14">小</option>
@@ -206,17 +209,17 @@
     <section id="guide" class="container mx-auto px-4 mt-8">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
             <div class="p-4 bg-gray-800 rounded-lg">
-                <h2 class="text-xl font-bold mb-2">STEP 1</h2>
+                <h2 class="text-xl font-bold mb-2">S1</h2>
                 <p class="mb-3">試験日とレベルを設定</p>
                 <button class="btn-primary px-4 py-2 rounded-lg" onclick="showSettings()">設定へ</button>
             </div>
             <div class="p-4 bg-gray-800 rounded-lg">
-                <h2 class="text-xl font-bold mb-2">STEP 2</h2>
+                <h2 class="text-xl font-bold mb-2">S2</h2>
                 <p class="mb-3">あなただけの学習プランを確認</p>
                 <button class="btn-primary px-4 py-2 rounded-lg" onclick="showTab('plan')">プランを見る</button>
             </div>
             <div class="p-4 bg-gray-800 rounded-lg">
-                <h2 class="text-xl font-bold mb-2">STEP 3</h2>
+                <h2 class="text-xl font-bold mb-2">S3</h2>
                 <p class="mb-3">今日のタスクに挑戦！</p>
                 <button class="btn-primary px-4 py-2 rounded-lg" onclick="showTab('dashboard')">学習開始</button>
             </div>
@@ -753,9 +756,9 @@
             setupCharts();
         });
 
-        function initializeApp() {
-            // Set default exam date if not set
-            if (!studyData.examDate) {
+       function initializeApp() {
+           // Set default exam date if not set
+           if (!studyData.examDate) {
                 const defaultDate = new Date();
                 defaultDate.setMonth(defaultDate.getMonth() + 3);
                 studyData.examDate = defaultDate.toISOString().split('T')[0];
@@ -772,9 +775,18 @@
                document.getElementById('font-size-selector').value = savedSize;
            }
 
-            const savedTheme = localStorage.getItem('theme') || 'dark';
+           const savedTheme = localStorage.getItem('theme') || 'dark';
             changeTheme(savedTheme);
            document.getElementById('theme-selector').value = savedTheme;
+
+           // Display STEP guide depending on saved state
+           const guideHidden = localStorage.getItem('guideHidden') === 'true';
+           if (guideHidden) {
+               const guide = document.getElementById('guide');
+               if (guide) {
+                   guide.classList.add('hidden');
+               }
+           }
 
            saveData();
             if (Object.keys(studyData.goals.daily || {}).length === 0) {
@@ -1352,11 +1364,22 @@
             showNotification('目標スコアを更新しました！', 'success');
         }
 
-        // Hide the initial STEP guide after configuration or actions
+        // Hide the STEP guide and remember the state
         function hideGuide() {
             const guide = document.getElementById('guide');
             if (guide) {
                 guide.classList.add('hidden');
+                localStorage.setItem('guideHidden', 'true');
+            }
+        }
+
+        // Show the STEP guide again
+        function showGuide() {
+            const guide = document.getElementById('guide');
+            if (guide) {
+                guide.classList.remove('hidden');
+                localStorage.setItem('guideHidden', 'false');
+                guide.scrollIntoView({ behavior: 'smooth' });
             }
         }
 
