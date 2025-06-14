@@ -224,9 +224,6 @@
         <div class="text-center mt-6">
             <button class="btn-primary px-8 py-3 rounded-lg text-lg font-semibold" onclick="showSettings()">まずは無料で始める</button>
         </div>
-        <div class="mt-8 flex justify-center">
-            <iframe class="w-full h-64 md:h-80 rounded-lg" src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="SC-SecLab デモ" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-        </div>
     </section>
 
     <!-- Navigation Tabs -->
@@ -886,6 +883,7 @@
         }
 
         function showTab(tabName) {
+            hideGuide();
             // Hide all tab contents
             document.querySelectorAll('.tab-content').forEach(tab => {
                 tab.classList.remove('active');
@@ -1354,6 +1352,14 @@
             showNotification('目標スコアを更新しました！', 'success');
         }
 
+        // Hide the initial STEP guide after configuration or actions
+        function hideGuide() {
+            const guide = document.getElementById('guide');
+            if (guide) {
+                guide.classList.add('hidden');
+            }
+        }
+
         function showSettings() {
             document.getElementById('settings-exam-date').value = studyData.examDate;
             document.getElementById('settings-daily-hours').value = studyData.dailyHours;
@@ -1361,6 +1367,8 @@
             document.getElementById('settings-daily-reminder').checked = document.getElementById('daily-reminder').checked;
             document.getElementById('settings-weekly-review').checked = document.getElementById('weekly-review').checked;
             document.getElementById('settings-exam-alert').checked = document.getElementById('exam-alert').checked;
+
+            hideGuide();
 
             document.getElementById('settings-modal').classList.remove('hidden');
             document.getElementById('settings-modal').classList.add('flex');
