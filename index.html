@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+        <!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
@@ -127,8 +127,11 @@
         body {
             padding-top: 120px;
         }
-
-        /* Adjustments for small screens can be added here */
+@media (max-width: 640px) {
+    body { padding-top: 160px; }
+    header h1 { font-size: 1.25rem; }
+    header p { font-size: 0.75rem; }
+}
     </style>
 </head>
 <body class="min-h-screen">
@@ -139,7 +142,7 @@
     <!-- Header -->
     <header class="glassmorphism shadow-lg fixed-header">
         <div class="container mx-auto px-4 py-4">
-            <div class="flex items-center justify-between">
+            <div class="flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0">
                 <div class="flex items-center space-x-3">
                     <div class="text-3xl">🛡️</div>
                     <div>
@@ -147,7 +150,7 @@
                         <p class="text-sm text-gray-300">情報処理安全確保支援士試験 合格支援</p>
                     </div>
                 </div>
-                <div class="flex items-center space-x-4">
+                <div class="flex flex-wrap items-center space-x-4 mt-4 sm:mt-0">
                     <div class="text-center">
                         <div class="text-lg font-bold text-green-400" id="study-streak">0</div>
                         <div class="text-xs text-gray-400">日連続</div>
