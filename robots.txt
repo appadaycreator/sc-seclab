@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://sc-seclab.com/sitemap.xml 
