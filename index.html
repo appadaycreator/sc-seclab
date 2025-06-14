@@ -581,6 +581,7 @@
                     <ul class="text-sm text-gray-400 space-y-1">
                         <li><a href="#" onclick="showPrivacyPolicy()">プライバシーポリシー</a></li>
                         <li><a href="#" onclick="showTerms()">利用規約</a></li>
+                        <li><a href="#" onclick="showUsage()">使い方</a></li>
                         <li><a href="#" onclick="showContact()">お問い合わせ</a></li>
                     </ul>
                 </div>
@@ -1255,6 +1256,10 @@ https://appadaycreator.github.io/sc-seclab
 
         function showTerms() {
             alert('利用規約（実装予定）');
+        }
+
+        function showUsage() {
+            window.open('./usage.html', '_blank');
         }
 
         function showContact() {
