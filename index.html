@@ -115,6 +115,8 @@
             background: var(--primary-blue);
             color: white;
         }
+
+        /* Adjustments for small screens can be added here */
     </style>
 </head>
 <body class="min-h-screen">
@@ -372,7 +374,7 @@
                 <div class="space-y-6">
                     <div class="glassmorphism rounded-xl p-6">
                         <h3 class="text-lg font-bold mb-4">演習統計</h3>
-                        <canvas id="practice-chart" style="height: 200px;"></canvas>
+                        <canvas id="practice-chart" class="w-full"></canvas>
                     </div>
 
                     <div class="glassmorphism rounded-xl p-6">
@@ -479,6 +481,45 @@
             </div>
         </div>
     </main>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="glassmorphism rounded-xl p-6 max-w-md w-full mx-4">
+            <h3 class="text-lg font-bold mb-4">設定</h3>
+            <form id="settings-form" class="space-y-4" onsubmit="updateSettings(event)">
+                <div>
+                    <label class="block text-sm font-medium mb-2">試験日</label>
+                    <input type="date" id="settings-exam-date" class="w-full p-3 bg-gray-800 rounded-lg border border-gray-600 focus:border-blue-400 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">現在のレベル</label>
+                    <select id="settings-current-level" class="w-full p-3 bg-gray-800 rounded-lg border border-gray-600 focus:border-blue-400 focus:outline-none">
+                        <option value="beginner">初心者</option>
+                        <option value="intermediate">中級者</option>
+                        <option value="advanced">上級者</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">1日の学習時間（時間）</label>
+                    <input type="number" id="settings-daily-hours" min="0.5" max="8" step="0.5" class="w-full p-3 bg-gray-800 rounded-lg border border-gray-600 focus:border-blue-400 focus:outline-none">
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="text-sm">毎日の学習通知</span>
+                    <input type="checkbox" id="settings-daily-reminder" class="toggle">
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="text-sm">週次レビュー</span>
+                    <input type="checkbox" id="settings-weekly-review" class="toggle">
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="text-sm">試験前アラート</span>
+                    <input type="checkbox" id="settings-exam-alert" class="toggle">
+                </div>
+                <button type="submit" class="w-full btn-primary py-3 rounded-lg font-semibold">保存</button>
+            </form>
+            <button onclick="closeSettings()" class="w-full mt-4 p-3 bg-gray-700 hover:bg-gray-600 rounded-lg font-semibold transition-colors">閉じる</button>
+        </div>
+    </div>
 
     <!-- Share Modal -->
     <div id="share-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
@@ -852,7 +893,7 @@
                     },
                     options: {
                         responsive: true,
-                        maintainAspectRatio: false,
+                        maintainAspectRatio: true,
                         plugins: {
                             legend: {
                                 labels: { color: '#e1e8ed' }
@@ -1093,8 +1134,33 @@
         }
 
         function showSettings() {
-            // Settings modal logic
-            alert('設定画面（実装予定）');
+            document.getElementById('settings-exam-date').value = studyData.examDate;
+            document.getElementById('settings-daily-hours').value = studyData.dailyHours;
+            document.getElementById('settings-current-level').value = studyData.currentLevel;
+            document.getElementById('settings-daily-reminder').checked = document.getElementById('daily-reminder').checked;
+            document.getElementById('settings-weekly-review').checked = document.getElementById('weekly-review').checked;
+            document.getElementById('settings-exam-alert').checked = document.getElementById('exam-alert').checked;
+
+            document.getElementById('settings-modal').classList.remove('hidden');
+            document.getElementById('settings-modal').classList.add('flex');
+        }
+
+        function closeSettings() {
+            document.getElementById('settings-modal').classList.add('hidden');
+            document.getElementById('settings-modal').classList.remove('flex');
+        }
+
+        function updateSettings(event) {
+            event.preventDefault();
+            studyData.examDate = document.getElementById('settings-exam-date').value;
+            studyData.dailyHours = parseFloat(document.getElementById('settings-daily-hours').value);
+            studyData.currentLevel = document.getElementById('settings-current-level').value;
+            document.getElementById('daily-reminder').checked = document.getElementById('settings-daily-reminder').checked;
+            document.getElementById('weekly-review').checked = document.getElementById('settings-weekly-review').checked;
+            document.getElementById('exam-alert').checked = document.getElementById('settings-exam-alert').checked;
+            saveData();
+            closeSettings();
+            showNotification('設定を保存しました', 'success');
         }
 
         function showNotification(message, type = 'info') {
@@ -1175,7 +1241,7 @@ https://appadaycreator.github.io/sc-seclab
         // PWA Service Worker
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
-                navigator.serviceWorker.register('/sw.js').then(function(registration) {
+                navigator.serviceWorker.register('./sw.js').then(function(registration) {
                     console.log('ServiceWorker registration successful');
                 }, function(err) {
                     console.log('ServiceWorker registration failed: ', err);
