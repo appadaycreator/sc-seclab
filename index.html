@@ -369,6 +369,13 @@
                         </form>
                     </div>
 
+                    <div class="glassmorphism rounded-xl p-6" id="goal-summary">
+                        <h3 class="text-lg font-bold mb-4">学習目標</h3>
+                        <div class="mb-4" id="monthly-goals"></div>
+                        <div class="mb-4" id="weekly-goals"></div>
+                        <div id="daily-goals"></div>
+                    </div>
+
                     <div class="glassmorphism rounded-xl p-6">
                         <h3 class="text-lg font-bold mb-4">リマインダー</h3>
                         <div class="space-y-3">
@@ -702,6 +709,8 @@
             practiceScores: [],
             weakAreas: [],
             studyPlan: {},
+            goals: { monthly: {}, weekly: {}, daily: {} },
+            completedDays: {},
             lastStudyDate: null
         };
 
@@ -735,9 +744,13 @@
 
             const savedTheme = localStorage.getItem('theme') || 'dark';
             changeTheme(savedTheme);
-            document.getElementById('theme-selector').value = savedTheme;
+           document.getElementById('theme-selector').value = savedTheme;
 
            saveData();
+            if (Object.keys(studyData.goals.daily || {}).length === 0) {
+                computeGoals();
+            }
+            updateGoalDisplay();
        }
 
         function initializeNotifications() {
@@ -804,6 +817,39 @@
                 updateDashboard();
                 saveData();
             }
+        }
+
+        function computeGoals() {
+            const examDate = new Date(studyData.examDate);
+            const today = new Date();
+            const daysUntilExam = Math.ceil((examDate - today) / (1000 * 60 * 60 * 24));
+            studyData.goals = { monthly: {}, weekly: {}, daily: {} };
+            for (let i = 0; i < daysUntilExam; i++) {
+                const date = new Date(today);
+                date.setDate(today.getDate() + i);
+                const dateKey = date.toISOString().split('T')[0];
+                const monthKey = `${date.getFullYear()}-${('0' + (date.getMonth() + 1)).slice(-2)}`;
+                const weekKey = `W${Math.floor(i / 7) + 1}`;
+                if (!studyData.goals.monthly[monthKey]) studyData.goals.monthly[monthKey] = 0;
+                if (!studyData.goals.weekly[weekKey]) studyData.goals.weekly[weekKey] = 0;
+                studyData.goals.monthly[monthKey] += studyData.dailyHours;
+                studyData.goals.weekly[weekKey] += studyData.dailyHours;
+                studyData.goals.daily[dateKey] = { hours: studyData.dailyHours };
+            }
+        }
+
+        function updateGoalDisplay() {
+            const monthlyContainer = document.getElementById('monthly-goals');
+            const weeklyContainer = document.getElementById('weekly-goals');
+            const dailyContainer = document.getElementById('daily-goals');
+            if (!studyData.goals) return;
+            monthlyContainer.innerHTML = Object.entries(studyData.goals.monthly)
+                .map(([m, h]) => `<div>${m} : ${h}時間</div>`).join('');
+            weeklyContainer.innerHTML = Object.entries(studyData.goals.weekly)
+                .map(([w, h]) => `<div>${w} : ${h}時間</div>`).join('');
+            const todayKey = new Date().toISOString().split('T')[0];
+            const daily = studyData.goals.daily[todayKey];
+            dailyContainer.innerHTML = daily ? `本日の目標: ${daily.hours}時間` : '本日の目標はありません';
         }
 
         function showTab(tabName) {
@@ -888,6 +934,11 @@
                 if (studyData.studyPlan[dateKey]) {
                     taskIndicator.innerHTML = '<div class="w-2 h-2 bg-blue-400 rounded-full mx-auto"></div>';
                 }
+
+                if (studyData.completedDays[dateKey]) {
+                    dayElement.classList.add('bg-green-600', 'text-white');
+                    taskIndicator.innerHTML = '✓';
+                }
                 
                 dayElement.appendChild(dayNumber);
                 dayElement.appendChild(taskIndicator);
@@ -895,6 +946,8 @@
                 
                 calendarGrid.appendChild(dayElement);
             }
+
+            updateGoalDisplay();
         }
 
         function previousMonth() {
@@ -908,8 +961,12 @@
         }
 
         function selectDate(dateKey) {
-            // Handle date selection
-            console.log('Selected date:', dateKey);
+            if (studyData.studyPlan[dateKey]) {
+                studyData.completedDays[dateKey] = !studyData.completedDays[dateKey];
+                saveData();
+                renderCalendar();
+                updateGoalDisplay();
+            }
         }
 
         function generateStudyPlan(event) {
@@ -957,11 +1014,15 @@
                     ]
                 };
             }
-            
+
+            studyData.completedDays = {};
+            computeGoals();
+
             saveData();
             renderCalendar();
             updateDashboard();
-            
+            updateGoalDisplay();
+
             showNotification('学習プランを生成しました！', 'success');
         }
 
