@@ -156,6 +156,8 @@
                         <i class="fas fa-cog mr-2"></i>設定
                     </button>
                     <select id="font-size-selector" class="bg-gray-800 text-white rounded px-2 py-1" onchange="changeFontSize(this.value)">
+                        <option value="12">極小</option>
+                        <option value="14">小</option>
                         <option value="16">標準</option>
                         <option value="18">大</option>
                         <option value="20">特大</option>
@@ -209,7 +211,7 @@
                             <div class="grid grid-cols-2 gap-4 mt-6">
                                 <div class="text-center p-4 bg-gray-800 rounded-lg">
                                     <div class="text-2xl font-bold text-green-400" id="days-left">90</div>
-                                    <div class="text-sm text-gray-400">試験まで</div>
+                                    <div class="text-sm text-gray-400">試験まで<br><span id="exam-date-display"></span></div>
                                 </div>
                                 <div class="text-center p-4 bg-gray-800 rounded-lg">
                                     <div class="text-2xl font-bold text-yellow-400" id="predicted-score">65</div>
@@ -669,6 +671,7 @@
             
             document.getElementById('study-streak').textContent = studyData.studyStreak;
             document.getElementById('days-left').textContent = Math.max(0, daysLeft);
+            document.getElementById('exam-date-display').textContent = studyData.examDate;
             document.getElementById('overall-progress').textContent = studyData.overallProgress + '%';
             document.getElementById('progress-bar').style.width = studyData.overallProgress + '%';
             document.getElementById('predicted-score').textContent = calculatePredictedScore();
