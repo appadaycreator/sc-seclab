@@ -3,46 +3,1230 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SC SecLab</title>
-    <meta name="description" content="SC SecLab - セキュリティラボ">
+    <title>SC-SecLab（セキュラボ）- 情報処理安全確保支援士試験 合格支援プラットフォーム</title>
+    <meta name="description" content="SC-SecLab（セキュラボ）は情報処理安全確保支援士試験の合格に特化した学習支援プラットフォームです。個人の学習状況に応じた合格プランの自動作成、カレンダー機能による学習スケジュール管理、リマインド機能で継続学習をサポート。">
     
-    <!-- PWA関連 -->
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#ffffff">
-    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
-    
-    <!-- OGP -->
-    <meta property="og:title" content="SC SecLab">
-    <meta property="og:description" content="SC SecLab - セキュリティラボ">
+    <!-- OGP Meta Tags -->
+    <meta property="og:title" content="SC-SecLab（セキュラボ）- 情報処理安全確保支援士試験 合格支援プラットフォーム">
+    <meta property="og:description" content="SC試験合格に特化した学習プラン作成・管理プラットフォーム。個人最適化された学習計画で効率的に合格を目指せます。">
+    <meta property="og:image" content="https://cdn1.genspark.ai/user-upload-image/gpt_image_generated/bc7b7fc9-da9b-4597-9c8b-81e4a1a55d5a">
+    <meta property="og:url" content="https://appadaycreator.github.io/sc-seclab/">
     <meta property="og:type" content="website">
-    <meta property="og:image" content="images/ogp-image.jpg">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@appadaycreator">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🛡️%3C/text%3E%3C/svg%3E">
+    
+    <!-- External Libraries -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiU0MtU2VjTGFiIiwic2hvcnRfbmFtZSI6IlNDLVNlY0xhYiIsInN0YXJ0X3VybCI6Ii8iLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsImJhY2tncm91bmRfY29sb3IiOiIjMGYxNDE5IiwidGhlbWVfY29sb3IiOiIjMDBkNGZmIn0=">
+    
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-TXQGZRF9');</script>
     
     <style>
+        :root {
+            --primary-blue: #00d4ff;
+            --secondary-blue: #0099cc;
+            --dark-bg: #0f1419;
+            --dark-card: #1a1f2e;
+            --text-light: #e1e8ed;
+            --text-muted: #8b949e;
+            --success-green: #28a745;
+            --warning-orange: #ffc107;
+            --danger-red: #dc3545;
+        }
+        
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            line-height: 1.6;
+            background: linear-gradient(135deg, var(--dark-bg) 0%, #1a1f2e 100%);
+            color: var(--text-light);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .glassmorphism {
+            background: rgba(26, 31, 46, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(45deg, var(--primary-blue), var(--secondary-blue));
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 212, 255, 0.3);
+        }
+        
+        .calendar-day {
+            min-height: 100px;
+            transition: all 0.3s ease;
+        }
+        
+        .calendar-day:hover {
+            background: rgba(0, 212, 255, 0.1);
+        }
+        
+        .study-task {
+            background: linear-gradient(45deg, rgba(0, 212, 255, 0.1), rgba(0, 153, 204, 0.1));
+            border-left: 4px solid var(--primary-blue);
+        }
+        
+        .weak-area {
+            background: linear-gradient(45deg, rgba(220, 53, 69, 0.1), rgba(255, 99, 132, 0.1));
+            border-left: 4px solid var(--danger-red);
+        }
+        
+        .progress-bar {
+            background: linear-gradient(90deg, var(--primary-blue), var(--secondary-blue));
+            height: 8px;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        
+        .notification {
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateY(-100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .tab-button.active {
+            background: var(--primary-blue);
+            color: white;
         }
     </style>
 </head>
-<body>
-    <h1>SC SecLab</h1>
-    <p>セキュリティラボへようこそ</p>
+<body class="min-h-screen">
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TXQGZRF9"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    
+    <!-- Header -->
+    <header class="glassmorphism shadow-lg">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="text-3xl">🛡️</div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-white">SC-SecLab</h1>
+                        <p class="text-sm text-gray-300">情報処理安全確保支援士試験 合格支援</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="text-center">
+                        <div class="text-lg font-bold text-green-400" id="study-streak">0</div>
+                        <div class="text-xs text-gray-400">日連続</div>
+                    </div>
+                    <button class="btn-primary px-4 py-2 rounded-lg text-white font-semibold" onclick="showSettings()">
+                        <i class="fas fa-cog mr-2"></i>設定
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="container mx-auto px-4 mt-6">
+        <div class="flex space-x-4 overflow-x-auto">
+            <button class="tab-button px-6 py-3 rounded-lg font-semibold whitespace-nowrap active" onclick="showTab('dashboard')">
+                <i class="fas fa-tachometer-alt mr-2"></i>ダッシュボード
+            </button>
+            <button class="tab-button px-6 py-3 rounded-lg font-semibold whitespace-nowrap" onclick="showTab('plan')">
+                <i class="fas fa-calendar-alt mr-2"></i>学習プラン
+            </button>
+            <button class="tab-button px-6 py-3 rounded-lg font-semibold whitespace-nowrap" onclick="showTab('practice')">
+                <i class="fas fa-brain mr-2"></i>過去問演習
+            </button>
+            <button class="tab-button px-6 py-3 rounded-lg font-semibold whitespace-nowrap" onclick="showTab('analysis')">
+                <i class="fas fa-chart-line mr-2"></i>弱点分析
+            </button>
+            <button class="tab-button px-6 py-3 rounded-lg font-semibold whitespace-nowrap" onclick="showTab('prediction')">
+                <i class="fas fa-target mr-2"></i>合格予測
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- Dashboard Tab -->
+        <div id="dashboard" class="tab-content active">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Study Plan Summary -->
+                <div class="lg:col-span-2">
+                    <div class="glassmorphism rounded-xl p-6 mb-6">
+                        <h2 class="text-xl font-bold mb-4 flex items-center">
+                            <i class="fas fa-rocket mr-3 text-blue-400"></i>
+                            合格までの道のり
+                        </h2>
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center">
+                                <span>学習進捗</span>
+                                <span class="font-bold text-blue-400" id="overall-progress">0%</span>
+                            </div>
+                            <div class="w-full bg-gray-700 rounded-full h-3">
+                                <div class="progress-bar rounded-full h-3" style="width: 0%" id="progress-bar"></div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4 mt-6">
+                                <div class="text-center p-4 bg-gray-800 rounded-lg">
+                                    <div class="text-2xl font-bold text-green-400" id="days-left">90</div>
+                                    <div class="text-sm text-gray-400">試験まで</div>
+                                </div>
+                                <div class="text-center p-4 bg-gray-800 rounded-lg">
+                                    <div class="text-2xl font-bold text-yellow-400" id="predicted-score">65</div>
+                                    <div class="text-sm text-gray-400">予想スコア</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Today's Tasks -->
+                    <div class="glassmorphism rounded-xl p-6">
+                        <h3 class="text-lg font-bold mb-4 flex items-center">
+                            <i class="fas fa-tasks mr-3 text-green-400"></i>
+                            今日の学習予定
+                        </h3>
+                        <div class="space-y-3" id="today-tasks">
+                            <!-- Tasks will be populated here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="space-y-6">
+                    <div class="glassmorphism rounded-xl p-6">
+                        <h3 class="text-lg font-bold mb-4">学習統計</h3>
+                        <div class="space-y-4">
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">総学習時間</span>
+                                <span class="font-bold" id="total-study-time">0時間</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">完了した分野</span>
+                                <span class="font-bold" id="completed-areas">0/8</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">過去問正答率</span>
+                                <span class="font-bold text-green-400" id="accuracy-rate">0%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="glassmorphism rounded-xl p-6">
+                        <h3 class="text-lg font-bold mb-4">クイックアクション</h3>
+                        <div class="space-y-3">
+                            <button class="w-full btn-primary py-3 rounded-lg font-semibold" onclick="startStudySession()">
+                                <i class="fas fa-play mr-2"></i>学習開始
+                            </button>
+                            <button class="w-full bg-gray-700 hover:bg-gray-600 py-3 rounded-lg font-semibold transition-colors" onclick="takePracticeTest()">
+                                <i class="fas fa-pen mr-2"></i>過去問チャレンジ
+                            </button>
+                            <button class="w-full bg-gray-700 hover:bg-gray-600 py-3 rounded-lg font-semibold transition-colors" onclick="reviewWeakAreas()">
+                                <i class="fas fa-exclamation-triangle mr-2"></i>弱点復習
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Study Plan Tab -->
+        <div id="plan" class="tab-content">
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                <!-- Calendar -->
+                <div class="lg:col-span-3">
+                    <div class="glassmorphism rounded-xl p-6">
+                        <div class="flex justify-between items-center mb-6">
+                            <h2 class="text-xl font-bold flex items-center">
+                                <i class="fas fa-calendar-alt mr-3 text-blue-400"></i>
+                                学習カレンダー
+                            </h2>
+                            <div class="flex items-center space-x-4">
+                                <button onclick="previousMonth()" class="p-2 hover:bg-gray-700 rounded">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <span class="font-semibold" id="current-month">2024年12月</span>
+                                <button onclick="nextMonth()" class="p-2 hover:bg-gray-700 rounded">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-7 gap-1" id="calendar-grid">
+                            <!-- Calendar will be populated here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Plan Controls -->
+                <div class="space-y-6">
+                    <div class="glassmorphism rounded-xl p-6">
+                        <h3 class="text-lg font-bold mb-4">プラン設定</h3>
+                        <form class="space-y-4" onsubmit="generateStudyPlan(event)">
+                            <div>
+                                <label class="block text-sm font-medium mb-2">試験日</label>
+                                <input type="date" id="exam-date" class="w-full p-3 bg-gray-800 rounded-lg border border-gray-600 focus:border-blue-400 focus:outline-none" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2">現在のレベル</label>
+                                <select id="current-level" class="w-full p-3 bg-gray-800 rounded-lg border border-gray-600 focus:border-blue-400 focus:outline-none">
+                                    <option value="beginner">初心者</option>
+                                    <option value="intermediate">中級者</option>
+                                    <option value="advanced">上級者</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2">1日の学習時間（時間）</label>
+                                <input type="number" id="daily-hours" min="0.5" max="8" step="0.5" value="2" class="w-full p-3 bg-gray-800 rounded-lg border border-gray-600 focus:border-blue-400 focus:outline-none">
+                            </div>
+                            <button type="submit" class="w-full btn-primary py-3 rounded-lg font-semibold">
+                                <i class="fas fa-magic mr-2"></i>プラン生成
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="glassmorphism rounded-xl p-6">
+                        <h3 class="text-lg font-bold mb-4">リマインダー</h3>
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm">毎日の学習通知</span>
+                                <input type="checkbox" id="daily-reminder" class="toggle">
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm">週次レビュー</span>
+                                <input type="checkbox" id="weekly-review" class="toggle">
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm">試験前アラート</span>
+                                <input type="checkbox" id="exam-alert" class="toggle">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Practice Tab -->
+        <div id="practice" class="tab-content">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-2">
+                    <div class="glassmorphism rounded-xl p-6">
+                        <h2 class="text-xl font-bold mb-6 flex items-center">
+                            <i class="fas fa-brain mr-3 text-purple-400"></i>
+                            過去問演習
+                        </h2>
+                        
+                        <!-- Question Display -->
+                        <div class="mb-6" id="question-container">
+                            <div class="bg-gray-800 p-6 rounded-lg mb-4">
+                                <h3 class="font-bold mb-3">問題 <span id="question-number">1</span>/10</h3>
+                                <p class="mb-4" id="question-text">情報セキュリティマネジメントシステム（ISMS）の確立において、最も重要な要素はどれか。</p>
+                                <div class="space-y-2" id="question-options">
+                                    <label class="flex items-center p-3 hover:bg-gray-700 rounded cursor-pointer">
+                                        <input type="radio" name="answer" value="A" class="mr-3">
+                                        <span>A. 最新の技術を導入すること</span>
+                                    </label>
+                                    <label class="flex items-center p-3 hover:bg-gray-700 rounded cursor-pointer">
+                                        <input type="radio" name="answer" value="B" class="mr-3">
+                                        <span>B. 経営陣のコミットメント</span>
+                                    </label>
+                                    <label class="flex items-center p-3 hover:bg-gray-700 rounded cursor-pointer">
+                                        <input type="radio" name="answer" value="C" class="mr-3">
+                                        <span>C. セキュリティソフトの導入</span>
+                                    </label>
+                                    <label class="flex items-center p-3 hover:bg-gray-700 rounded cursor-pointer">
+                                        <input type="radio" name="answer" value="D" class="mr-3">
+                                        <span>D. 従業員の増員</span>
+                                    </label>
+                                </div>
+                                <div class="flex justify-between mt-4">
+                                    <button onclick="previousQuestion()" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded font-semibold">前の問題</button>
+                                    <button onclick="nextQuestion()" class="btn-primary px-4 py-2 rounded font-semibold">次の問題</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Practice Stats -->
+                <div class="space-y-6">
+                    <div class="glassmorphism rounded-xl p-6">
+                        <h3 class="text-lg font-bold mb-4">演習統計</h3>
+                        <canvas id="practice-chart" style="height: 200px;"></canvas>
+                    </div>
+
+                    <div class="glassmorphism rounded-xl p-6">
+                        <h3 class="text-lg font-bold mb-4">分野別正答率</h3>
+                        <div class="space-y-3" id="area-accuracy">
+                            <!-- Area accuracy will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analysis Tab -->
+        <div id="analysis" class="tab-content">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="glassmorphism rounded-xl p-6">
+                    <h2 class="text-xl font-bold mb-6 flex items-center">
+                        <i class="fas fa-exclamation-triangle mr-3 text-red-400"></i>
+                        弱点分析
+                    </h2>
+                    <canvas id="weakness-chart" style="height: 300px;"></canvas>
+                </div>
+
+                <div class="glassmorphism rounded-xl p-6">
+                    <h2 class="text-xl font-bold mb-6 flex items-center">
+                        <i class="fas fa-chart-line mr-3 text-green-400"></i>
+                        学習進捗
+                    </h2>
+                    <canvas id="progress-chart" style="height: 300px;"></canvas>
+                </div>
+
+                <div class="lg:col-span-2 glassmorphism rounded-xl p-6">
+                    <h3 class="text-lg font-bold mb-4">推奨学習アクション</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="recommended-actions">
+                        <!-- Recommendations will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Prediction Tab -->
+        <div id="prediction" class="tab-content">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-2">
+                    <div class="glassmorphism rounded-xl p-6 mb-6">
+                        <h2 class="text-xl font-bold mb-6 flex items-center">
+                            <i class="fas fa-target mr-3 text-blue-400"></i>
+                            合格予測
+                        </h2>
+                        <div class="text-center mb-6">
+                            <div class="text-6xl font-bold mb-2" id="prediction-score">75</div>
+                            <div class="text-xl text-gray-400">予想スコア</div>
+                            <div class="mt-4">
+                                <span class="px-4 py-2 rounded-full text-sm font-semibold" id="prediction-status">合格可能性: 高</span>
+                            </div>
+                        </div>
+                        <canvas id="prediction-chart" style="height: 250px;"></canvas>
+                    </div>
+
+                    <div class="glassmorphism rounded-xl p-6">
+                        <h3 class="text-lg font-bold mb-4">合格への提案</h3>
+                        <div class="space-y-4" id="improvement-suggestions">
+                            <!-- Suggestions will be populated here -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="glassmorphism rounded-xl p-6">
+                        <h3 class="text-lg font-bold mb-4">試験情報</h3>
+                        <div class="space-y-4">
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">合格基準</span>
+                                <span class="font-bold">60点以上</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">試験時間</span>
+                                <span class="font-bold">150分</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">出題数</span>
+                                <span class="font-bold">午前25問 + 午後3問</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">合格率</span>
+                                <span class="font-bold">約20%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glassmorphism rounded-xl p-6">
+                        <h3 class="text-lg font-bold mb-4">目標設定</h3>
+                        <form class="space-y-4" onsubmit="updateGoal(event)">
+                            <div>
+                                <label class="block text-sm font-medium mb-2">目標スコア</label>
+                                <input type="number" id="target-score" min="60" max="100" value="70" class="w-full p-3 bg-gray-800 rounded-lg border border-gray-600 focus:border-blue-400 focus:outline-none">
+                            </div>
+                            <button type="submit" class="w-full btn-primary py-3 rounded-lg font-semibold">
+                                目標更新
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Share Modal -->
+    <div id="share-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="glassmorphism rounded-xl p-6 max-w-md w-full mx-4">
+            <h3 class="text-lg font-bold mb-4">学習成果をシェア</h3>
+            <div class="space-y-3">
+                <button onclick="shareToX()" class="w-full flex items-center justify-center p-3 bg-blue-500 hover:bg-blue-600 rounded-lg font-semibold transition-colors">
+                    <i class="fab fa-twitter mr-2"></i>X (Twitter)
+                </button>
+                <button onclick="shareToFacebook()" class="w-full flex items-center justify-center p-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-semibold transition-colors">
+                    <i class="fab fa-facebook mr-2"></i>Facebook
+                </button>
+                <button onclick="shareToLine()" class="w-full flex items-center justify-center p-3 bg-green-500 hover:bg-green-600 rounded-lg font-semibold transition-colors">
+                    <i class="fab fa-line mr-2"></i>LINE
+                </button>
+            </div>
+            <button onclick="closeShareModal()" class="w-full mt-4 p-3 bg-gray-700 hover:bg-gray-600 rounded-lg font-semibold transition-colors">
+                閉じる
+            </button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="glassmorphism mt-12">
+        <div class="container mx-auto px-4 py-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div>
+                    <h3 class="font-bold mb-3">SC-SecLab</h3>
+                    <p class="text-sm text-gray-400">情報処理安全確保支援士試験の合格を支援する学習プラットフォーム</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-3">機能</h4>
+                    <ul class="text-sm text-gray-400 space-y-1">
+                        <li><a href="#" onclick="showTab('plan')">学習プラン作成</a></li>
+                        <li><a href="#" onclick="showTab('practice')">過去問演習</a></li>
+                        <li><a href="#" onclick="showTab('analysis')">弱点分析</a></li>
+                        <li><a href="#" onclick="showTab('prediction')">合格予測</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-3">サポート</h4>
+                    <ul class="text-sm text-gray-400 space-y-1">
+                        <li><a href="#" onclick="showPrivacyPolicy()">プライバシーポリシー</a></li>
+                        <li><a href="#" onclick="showTerms()">利用規約</a></li>
+                        <li><a href="#" onclick="showContact()">お問い合わせ</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-3">フォロー</h4>
+                    <div class="flex space-x-3">
+                        <a href="https://x.com/appadaycreator" target="_blank" class="text-blue-400 hover:text-blue-300">
+                            <i class="fab fa-twitter text-xl"></i>
+                        </a>
+                        <a href="#" class="text-blue-400 hover:text-blue-300">
+                            <i class="fab fa-github text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-4 text-center text-sm text-gray-400">
+                © 2024 SC-SecLab. All rights reserved.
+            </div>
+        </div>
+    </footer>
 
     <script>
-        // Service Worker登録
+        // Global variables
+        let currentDate = new Date();
+        let studyData = JSON.parse(localStorage.getItem('scSecLabData')) || {
+            studyStreak: 0,
+            totalStudyTime: 0,
+            completedAreas: 0,
+            accuracyRate: 0,
+            overallProgress: 0,
+            examDate: null,
+            dailyHours: 2,
+            currentLevel: 'beginner',
+            practiceScores: [],
+            weakAreas: [],
+            studyPlan: {},
+            lastStudyDate: null
+        };
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+            initializeNotifications();
+            updateDashboard();
+            renderCalendar();
+            setupCharts();
+        });
+
+        function initializeApp() {
+            // Set default exam date if not set
+            if (!studyData.examDate) {
+                const defaultDate = new Date();
+                defaultDate.setMonth(defaultDate.getMonth() + 3);
+                studyData.examDate = defaultDate.toISOString().split('T')[0];
+            }
+            
+            // Update UI elements
+            document.getElementById('exam-date').value = studyData.examDate;
+            document.getElementById('daily-hours').value = studyData.dailyHours;
+            document.getElementById('current-level').value = studyData.currentLevel;
+            
+            saveData();
+        }
+
+        function initializeNotifications() {
+            if ('Notification' in window && Notification.permission !== 'granted') {
+                Notification.requestPermission();
+            }
+        }
+
+        function saveData() {
+            localStorage.setItem('scSecLabData', JSON.stringify(studyData));
+        }
+
+        function updateDashboard() {
+            const examDate = new Date(studyData.examDate);
+            const today = new Date();
+            const daysLeft = Math.ceil((examDate - today) / (1000 * 60 * 60 * 24));
+            
+            document.getElementById('study-streak').textContent = studyData.studyStreak;
+            document.getElementById('days-left').textContent = Math.max(0, daysLeft);
+            document.getElementById('overall-progress').textContent = studyData.overallProgress + '%';
+            document.getElementById('progress-bar').style.width = studyData.overallProgress + '%';
+            document.getElementById('predicted-score').textContent = calculatePredictedScore();
+            document.getElementById('total-study-time').textContent = studyData.totalStudyTime + '時間';
+            document.getElementById('completed-areas').textContent = studyData.completedAreas + '/8';
+            document.getElementById('accuracy-rate').textContent = studyData.accuracyRate + '%';
+            
+            updateTodayTasks();
+        }
+
+        function updateTodayTasks() {
+            const today = new Date().toISOString().split('T')[0];
+            const tasksContainer = document.getElementById('today-tasks');
+            
+            const defaultTasks = [
+                { title: '午前問題演習', time: '30分', completed: false, type: 'practice' },
+                { title: 'セキュリティ技術の復習', time: '45分', completed: false, type: 'study' },
+                { title: '午後問題対策', time: '60分', completed: false, type: 'practice' }
+            ];
+            
+            tasksContainer.innerHTML = defaultTasks.map((task, index) => `
+                <div class="study-task p-4 rounded-lg flex items-center justify-between">
+                    <div class="flex items-center">
+                        <input type="checkbox" ${task.completed ? 'checked' : ''} 
+                               onchange="toggleTask(${index})" class="mr-3">
+                        <div>
+                            <div class="font-semibold">${task.title}</div>
+                            <div class="text-sm text-gray-400">${task.time}</div>
+                        </div>
+                    </div>
+                    <i class="fas fa-${task.type === 'practice' ? 'brain' : 'book'} text-blue-400"></i>
+                </div>
+            `).join('');
+        }
+
+        function toggleTask(index) {
+            // Update task completion status
+            const checkbox = event.target;
+            if (checkbox.checked) {
+                studyData.overallProgress = Math.min(100, studyData.overallProgress + 2);
+                updateDashboard();
+                saveData();
+            }
+        }
+
+        function showTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all tab buttons
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+            
+            // Update specific tab content
+            if (tabName === 'plan') {
+                renderCalendar();
+            } else if (tabName === 'practice') {
+                loadPracticeQuestion();
+            } else if (tabName === 'analysis') {
+                updateAnalysisCharts();
+            } else if (tabName === 'prediction') {
+                updatePredictionTab();
+            }
+        }
+
+        function renderCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const startDate = new Date(firstDay);
+            startDate.setDate(startDate.getDate() - firstDay.getDay());
+            
+            document.getElementById('current-month').textContent = 
+                `${year}年${month + 1}月`;
+            
+            const calendarGrid = document.getElementById('calendar-grid');
+            calendarGrid.innerHTML = '';
+            
+            // Add day headers
+            const dayHeaders = ['日', '月', '火', '水', '木', '金', '土'];
+            dayHeaders.forEach(day => {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'p-2 text-center font-semibold text-gray-400';
+                dayElement.textContent = day;
+                calendarGrid.appendChild(dayElement);
+            });
+            
+            // Add calendar days
+            for (let i = 0; i < 42; i++) {
+                const currentDay = new Date(startDate);
+                currentDay.setDate(startDate.getDate() + i);
+                
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day p-2 border border-gray-700 cursor-pointer';
+                
+                const isCurrentMonth = currentDay.getMonth() === month;
+                const isToday = currentDay.toDateString() === new Date().toDateString();
+                
+                if (!isCurrentMonth) {
+                    dayElement.classList.add('text-gray-600');
+                }
+                
+                if (isToday) {
+                    dayElement.classList.add('bg-blue-600');
+                }
+                
+                const dayNumber = document.createElement('div');
+                dayNumber.className = 'font-semibold mb-1';
+                dayNumber.textContent = currentDay.getDate();
+                
+                const taskIndicator = document.createElement('div');
+                taskIndicator.className = 'text-xs';
+                
+                // Add study plan indicators
+                const dateKey = currentDay.toISOString().split('T')[0];
+                if (studyData.studyPlan[dateKey]) {
+                    taskIndicator.innerHTML = '<div class="w-2 h-2 bg-blue-400 rounded-full mx-auto"></div>';
+                }
+                
+                dayElement.appendChild(dayNumber);
+                dayElement.appendChild(taskIndicator);
+                dayElement.addEventListener('click', () => selectDate(dateKey));
+                
+                calendarGrid.appendChild(dayElement);
+            }
+        }
+
+        function previousMonth() {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            renderCalendar();
+        }
+
+        function nextMonth() {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            renderCalendar();
+        }
+
+        function selectDate(dateKey) {
+            // Handle date selection
+            console.log('Selected date:', dateKey);
+        }
+
+        function generateStudyPlan(event) {
+            event.preventDefault();
+            
+            const examDate = document.getElementById('exam-date').value;
+            const currentLevel = document.getElementById('current-level').value;
+            const dailyHours = parseFloat(document.getElementById('daily-hours').value);
+            
+            studyData.examDate = examDate;
+            studyData.currentLevel = currentLevel;
+            studyData.dailyHours = dailyHours;
+            
+            // Generate study plan logic
+            const exam = new Date(examDate);
+            const today = new Date();
+            const daysUntilExam = Math.ceil((exam - today) / (1000 * 60 * 60 * 24));
+            
+            const studyAreas = [
+                'セキュリティ基礎',
+                '暗号化技術',
+                'ネットワークセキュリティ',
+                'アプリケーションセキュリティ',
+                'システムセキュリティ',
+                'セキュリティマネジメント',
+                '法制度・ガイドライン',
+                '午後問題対策'
+            ];
+            
+            // Create daily study plan
+            studyData.studyPlan = {};
+            for (let i = 0; i < daysUntilExam; i++) {
+                const date = new Date(today);
+                date.setDate(today.getDate() + i);
+                const dateKey = date.toISOString().split('T')[0];
+                
+                const areaIndex = i % studyAreas.length;
+                studyData.studyPlan[dateKey] = {
+                    area: studyAreas[areaIndex],
+                    duration: dailyHours,
+                    tasks: [
+                        `${studyAreas[areaIndex]}の理論学習`,
+                        '過去問演習',
+                        '弱点復習'
+                    ]
+                };
+            }
+            
+            saveData();
+            renderCalendar();
+            updateDashboard();
+            
+            showNotification('学習プランを生成しました！', 'success');
+        }
+
+        function loadPracticeQuestion() {
+            // Sample question for demonstration
+            const questions = [
+                {
+                    text: "情報セキュリティマネジメントシステム（ISMS）の確立において、最も重要な要素はどれか。",
+                    options: [
+                        "A. 最新の技術を導入すること",
+                        "B. 経営陣のコミットメント",
+                        "C. セキュリティソフトの導入",
+                        "D. 従業員の増員"
+                    ],
+                    correct: "B"
+                }
+            ];
+            
+            const question = questions[0];
+            document.getElementById('question-text').textContent = question.text;
+            
+            const optionsContainer = document.getElementById('question-options');
+            optionsContainer.innerHTML = question.options.map((option, index) => `
+                <label class="flex items-center p-3 hover:bg-gray-700 rounded cursor-pointer">
+                    <input type="radio" name="answer" value="${option.charAt(0)}" class="mr-3">
+                    <span>${option}</span>
+                </label>
+            `).join('');
+        }
+
+        function setupCharts() {
+            // Practice Chart
+            const practiceCtx = document.getElementById('practice-chart');
+            if (practiceCtx) {
+                new Chart(practiceCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['1週間前', '6日前', '5日前', '4日前', '3日前', '2日前', '昨日'],
+                        datasets: [{
+                            label: '正答率',
+                            data: [45, 52, 48, 65, 59, 70, 75],
+                            borderColor: '#00d4ff',
+                            backgroundColor: 'rgba(0, 212, 255, 0.1)',
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                labels: { color: '#e1e8ed' }
+                            }
+                        },
+                        scales: {
+                            x: { ticks: { color: '#8b949e' }, grid: { color: '#374151' } },
+                            y: { ticks: { color: '#8b949e' }, grid: { color: '#374151' } }
+                        }
+                    }
+                });
+            }
+        }
+
+        function updateAnalysisCharts() {
+            // Weakness Chart
+            const weaknessCtx = document.getElementById('weakness-chart');
+            if (weaknessCtx) {
+                new Chart(weaknessCtx, {
+                    type: 'radar',
+                    data: {
+                        labels: ['セキュリティ基礎', '暗号化', 'ネットワーク', 'アプリ', 'システム', 'マネジメント', '法制度', '午後対策'],
+                        datasets: [{
+                            label: '習熟度',
+                            data: [65, 45, 70, 55, 60, 50, 40, 35],
+                            borderColor: '#00d4ff',
+                            backgroundColor: 'rgba(0, 212, 255, 0.2)',
+                            pointBackgroundColor: '#00d4ff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                labels: { color: '#e1e8ed' }
+                            }
+                        },
+                        scales: {
+                            r: {
+                                beginAtZero: true,
+                                max: 100,
+                                ticks: { color: '#8b949e' },
+                                grid: { color: '#374151' },
+                                pointLabels: { color: '#8b949e' }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Progress Chart
+            const progressCtx = document.getElementById('progress-chart');
+            if (progressCtx) {
+                new Chart(progressCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+                        datasets: [{
+                            label: '学習時間',
+                            data: [12, 15, 18, 14],
+                            backgroundColor: '#00d4ff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                labels: { color: '#e1e8ed' }
+                            }
+                        },
+                        scales: {
+                            x: { ticks: { color: '#8b949e' }, grid: { color: '#374151' } },
+                            y: { ticks: { color: '#8b949e' }, grid: { color: '#374151' } }
+                        }
+                    }
+                });
+            }
+            
+            // Update recommended actions
+            const recommendations = [
+                { title: '午後問題対策を強化', description: '記述問題の練習を増やしましょう', priority: 'high' },
+                { title: '暗号化技術の復習', description: '基礎理論の理解を深めましょう', priority: 'medium' },
+                { title: '法制度の暗記', description: '重要な法律・ガイドラインを覚えましょう', priority: 'medium' },
+                { title: '模擬試験の実施', description: '本番形式での練習を行いましょう', priority: 'high' }
+            ];
+            
+            const actionsContainer = document.getElementById('recommended-actions');
+            actionsContainer.innerHTML = recommendations.map(rec => `
+                <div class="weak-area p-4 rounded-lg">
+                    <div class="flex items-center justify-between mb-2">
+                        <h4 class="font-semibold">${rec.title}</h4>
+                        <span class="px-2 py-1 text-xs rounded ${rec.priority === 'high' ? 'bg-red-600' : 'bg-yellow-600'} text-white">
+                            ${rec.priority === 'high' ? '緊急' : '重要'}
+                        </span>
+                    </div>
+                    <p class="text-sm text-gray-400">${rec.description}</p>
+                </div>
+            `).join('');
+        }
+
+        function updatePredictionTab() {
+            const predictedScore = calculatePredictedScore();
+            document.getElementById('prediction-score').textContent = predictedScore;
+            
+            const status = predictedScore >= 70 ? '合格可能性: 高' : 
+                          predictedScore >= 60 ? '合格可能性: 中' : '合格可能性: 低';
+            const statusElement = document.getElementById('prediction-status');
+            statusElement.textContent = status;
+            statusElement.className = `px-4 py-2 rounded-full text-sm font-semibold ${
+                predictedScore >= 70 ? 'bg-green-600' : 
+                predictedScore >= 60 ? 'bg-yellow-600' : 'bg-red-600'
+            } text-white`;
+            
+            // Prediction Chart
+            const predictionCtx = document.getElementById('prediction-chart');
+            if (predictionCtx) {
+                new Chart(predictionCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['現在', '1週間後', '2週間後', '3週間後', '試験日'],
+                        datasets: [{
+                            label: '予想スコア',
+                            data: [predictedScore, predictedScore + 5, predictedScore + 8, predictedScore + 10, predictedScore + 12],
+                            borderColor: '#00d4ff',
+                            backgroundColor: 'rgba(0, 212, 255, 0.1)',
+                            tension: 0.4
+                        }, {
+                            label: '合格ライン',
+                            data: [60, 60, 60, 60, 60],
+                            borderColor: '#28a745',
+                            borderDash: [5, 5]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                labels: { color: '#e1e8ed' }
+                            }
+                        },
+                        scales: {
+                            x: { ticks: { color: '#8b949e' }, grid: { color: '#374151' } },
+                            y: { 
+                                ticks: { color: '#8b949e' }, 
+                                grid: { color: '#374151' },
+                                min: 0,
+                                max: 100
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Update improvement suggestions
+            const suggestions = [
+                { text: '午後問題の記述練習を1日1問追加', impact: '+5点' },
+                { text: '弱点分野の集中学習', impact: '+8点' },
+                { text: '模擬試験を週2回実施', impact: '+7点' },
+                { text: '過去問の復習サイクル確立', impact: '+6点' }
+            ];
+            
+            const suggestionsContainer = document.getElementById('improvement-suggestions');
+            suggestionsContainer.innerHTML = suggestions.map(suggestion => `
+                <div class="flex items-center justify-between p-4 bg-gray-800 rounded-lg">
+                    <span>${suggestion.text}</span>
+                    <span class="text-green-400 font-semibold">${suggestion.impact}</span>
+                </div>
+            `).join('');
+        }
+
+        function calculatePredictedScore() {
+            const baseScore = 50;
+            const progressBonus = studyData.overallProgress * 0.3;
+            const accuracyBonus = studyData.accuracyRate * 0.2;
+            const levelMultiplier = {
+                'beginner': 1.0,
+                'intermediate': 1.2,
+                'advanced': 1.4
+            };
+            
+            return Math.min(100, Math.round(
+                (baseScore + progressBonus + accuracyBonus) * levelMultiplier[studyData.currentLevel]
+            ));
+        }
+
+        function startStudySession() {
+            const startTime = new Date();
+            studyData.lastStudyDate = startTime.toISOString().split('T')[0];
+            
+            // Update study streak
+            const today = new Date().toISOString().split('T')[0];
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            const yesterdayStr = yesterday.toISOString().split('T')[0];
+            
+            if (studyData.lastStudyDate === today) {
+                // Already studied today
+            } else if (studyData.lastStudyDate === yesterdayStr) {
+                studyData.studyStreak++;
+            } else {
+                studyData.studyStreak = 1;
+            }
+            
+            saveData();
+            updateDashboard();
+            showNotification('学習セッションを開始しました！', 'success');
+        }
+
+        function takePracticeTest() {
+            showTab('practice');
+            showNotification('過去問演習を開始します！', 'info');
+        }
+
+        function reviewWeakAreas() {
+            showTab('analysis');
+            showNotification('弱点分野の確認を行います！', 'info');
+        }
+
+        function nextQuestion() {
+            // Handle next question logic
+            showNotification('次の問題に進みました', 'info');
+        }
+
+        function previousQuestion() {
+            // Handle previous question logic
+            showNotification('前の問題に戻りました', 'info');
+        }
+
+        function updateGoal(event) {
+            event.preventDefault();
+            const targetScore = document.getElementById('target-score').value;
+            studyData.targetScore = parseInt(targetScore);
+            saveData();
+            showNotification('目標スコアを更新しました！', 'success');
+        }
+
+        function showSettings() {
+            // Settings modal logic
+            alert('設定画面（実装予定）');
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${
+                type === 'success' ? 'bg-green-600' : 
+                type === 'error' ? 'bg-red-600' : 'bg-blue-600'
+            } text-white`;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Share functions
+        function openShareModal() {
+            document.getElementById('share-modal').classList.remove('hidden');
+            document.getElementById('share-modal').classList.add('flex');
+        }
+
+        function closeShareModal() {
+            document.getElementById('share-modal').classList.add('hidden');
+            document.getElementById('share-modal').classList.remove('flex');
+        }
+
+        function shareToX() {
+            const progress = studyData.overallProgress;
+            const streak = studyData.studyStreak;
+            const text = `30日連続開発チャレンジ（136/30）
+
+https://appadaycreator.github.io/sc-seclab
+
+🛡️SC試験対策の進捗を報告！
+現在の学習進捗: ${progress}%
+連続学習記録: ${streak}日
+✅ 学習プラン完了
+✅ 弱点を可視化
+✅ 合格予測機能
+
+情報処理安全確保支援士への道のり💪
+
+#継続は力なり #情報処理安全確保支援士 #セキュリティエンジニア #学習記録 #無料ツール`;
+            
+            const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+            window.open(url, '_blank');
+            closeShareModal();
+        }
+
+        function shareToFacebook() {
+            const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`;
+            window.open(url, '_blank');
+            closeShareModal();
+        }
+
+        function shareToLine() {
+            const text = `SC試験対策プラットフォーム SC-SecLab`;
+            const url = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(text)}`;
+            window.open(url, '_blank');
+            closeShareModal();
+        }
+
+        // Privacy Policy and Terms
+        function showPrivacyPolicy() {
+            window.open('./privacy.html', '_blank');
+        }
+
+        function showTerms() {
+            alert('利用規約（実装予定）');
+        }
+
+        function showContact() {
+            alert('お問い合わせ（実装予定）');
+        }
+
+        // PWA Service Worker
         if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
-                    .then(registration => {
-                        console.log('ServiceWorker registration successful');
-                    })
-                    .catch(err => {
-                        console.log('ServiceWorker registration failed: ', err);
-                    });
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js').then(function(registration) {
+                    console.log('ServiceWorker registration successful');
+                }, function(err) {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
             });
         }
+
+        // Reminder notifications
+        function setupReminders() {
+            if ('Notification' in window && Notification.permission === 'granted') {
+                const dailyReminder = document.getElementById('daily-reminder').checked;
+                const weeklyReview = document.getElementById('weekly-review').checked;
+                const examAlert = document.getElementById('exam-alert').checked;
+                
+                if (dailyReminder) {
+                    scheduleNotification('学習の時間です！今日の目標を達成しましょう', 19 * 60 * 60 * 1000); // 19:00
+                }
+                
+                if (weeklyReview) {
+                    const nextSunday = new Date();
+                    nextSunday.setDate(nextSunday.getDate() + (7 - nextSunday.getDay()));
+                    nextSunday.setHours(10, 0, 0, 0);
+                    scheduleNotification('週次レビューの時間です', nextSunday.getTime() - Date.now());
+                }
+                
+                if (examAlert) {
+                    const examDate = new Date(studyData.examDate);
+                    const alertDate = new Date(examDate);
+                    alertDate.setDate(examDate.getDate() - 7);
+                    if (alertDate > new Date()) {
+                        scheduleNotification('試験まで1週間です！最終確認を行いましょう', alertDate.getTime() - Date.now());
+                    }
+                }
+            }
+        }
+
+        function scheduleNotification(message, delay) {
+            setTimeout(() => {
+                if (Notification.permission === 'granted') {
+                    new Notification('SC-SecLab', {
+                        body: message,
+                        icon: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Ctext y=".9em" font-size="90"%3E🛡️%3C/text%3E%3C/svg%3E'
+                    });
+                }
+            }, delay);
+        }
+
+        // Auto-save functionality
+        setInterval(() => {
+            saveData();
+        }, 30000); // Save every 30 seconds
     </script>
 </body>
-</html> 
+</html>
