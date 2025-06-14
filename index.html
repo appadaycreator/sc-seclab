@@ -93,6 +93,21 @@
             border-radius: 4px;
             transition: width 0.5s ease;
         }
+
+        /* Light theme settings */
+        body.theme-light {
+            --dark-bg: #ffffff;
+            --dark-card: #ffffff;
+            --text-light: #333333;
+            --text-muted: #666666;
+            background: linear-gradient(135deg, #ffffff 0%, #f2f2f2 100%);
+            color: #333333;
+        }
+
+        body.theme-light .glassmorphism {
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
         
         .notification {
             animation: slideIn 0.3s ease;
@@ -134,7 +149,7 @@
 }
     </style>
 </head>
-<body class="min-h-screen">
+<body class="min-h-screen theme-dark">
     <!-- Google Tag Manager (noscript) -->
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TXQGZRF9"
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
@@ -164,6 +179,10 @@
                         <option value="16" selected>標準</option>
                         <option value="18">大</option>
                         <option value="20">特大</option>
+                    </select>
+                    <select id="theme-selector" class="bg-gray-800 text-white rounded px-2 py-1" onchange="changeTheme(this.value)">
+                        <option value="dark">ダーク</option>
+                        <option value="light">ライト</option>
                     </select>
                 </div>
             </div>
@@ -211,14 +230,22 @@
                             <div class="w-full bg-gray-700 rounded-full h-3">
                                 <div class="progress-bar rounded-full h-3" style="width: 0%" id="progress-bar"></div>
                             </div>
-                            <div class="grid grid-cols-2 gap-4 mt-6">
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
                                 <div class="text-center p-4 bg-gray-800 rounded-lg">
                                     <div class="text-2xl font-bold text-green-400" id="days-left">90</div>
                                     <div class="text-sm text-gray-400">試験まで<br><span id="exam-date-display"></span></div>
                                 </div>
                                 <div class="text-center p-4 bg-gray-800 rounded-lg">
-                                    <div class="text-2xl font-bold text-yellow-400" id="predicted-score">65</div>
-                                    <div class="text-sm text-gray-400">予想スコア</div>
+                                    <div class="text-2xl font-bold text-yellow-400" id="pred-m1">0</div>
+                                    <div class="text-sm text-gray-400">午前1予想</div>
+                                </div>
+                                <div class="text-center p-4 bg-gray-800 rounded-lg">
+                                    <div class="text-2xl font-bold text-yellow-400" id="pred-m2">0</div>
+                                    <div class="text-sm text-gray-400">午前2予想</div>
+                                </div>
+                                <div class="text-center p-4 bg-gray-800 rounded-lg">
+                                    <div class="text-2xl font-bold text-yellow-400" id="pred-af">0</div>
+                                    <div class="text-sm text-gray-400">午後予想</div>
                                 </div>
                             </div>
                         </div>
@@ -432,7 +459,21 @@
                         <div class="text-center mb-6">
                             <div class="text-6xl font-bold mb-2" id="prediction-score">75</div>
                             <div class="text-xl text-gray-400">予想スコア</div>
-                            <div class="mt-4">
+                            <div class="grid grid-cols-3 gap-4 my-4">
+                                <div>
+                                    <div class="text-2xl font-bold text-yellow-400" id="pred-detail-m1">0</div>
+                                    <div class="text-sm text-gray-400">午前1</div>
+                                </div>
+                                <div>
+                                    <div class="text-2xl font-bold text-yellow-400" id="pred-detail-m2">0</div>
+                                    <div class="text-sm text-gray-400">午前2</div>
+                                </div>
+                                <div>
+                                    <div class="text-2xl font-bold text-yellow-400" id="pred-detail-af">0</div>
+                                    <div class="text-sm text-gray-400">午後</div>
+                                </div>
+                            </div>
+                            <div class="mt-2">
                                 <span class="px-4 py-2 rounded-full text-sm font-semibold" id="prediction-status">合格可能性: 高</span>
                             </div>
                         </div>
@@ -587,6 +628,7 @@
                         <li><a href="#" onclick="showTerms()">利用規約</a></li>
                         <li><a href="#" onclick="showUsage()">使い方</a></li>
                         <li><a href="#" onclick="showContact()">お問い合わせ</a></li>
+                        <li><a href="https://www.sc-siken.com/sc/" target="_blank">道場サイト</a></li>
                     </ul>
                 </div>
                 <div>
@@ -665,14 +707,18 @@
             document.getElementById('daily-hours').value = studyData.dailyHours;
             document.getElementById('current-level').value = studyData.currentLevel;
 
-            const savedSize = localStorage.getItem('fontSize');
-            if (savedSize) {
-                changeFontSize(savedSize);
-                document.getElementById('font-size-selector').value = savedSize;
-            }
+           const savedSize = localStorage.getItem('fontSize');
+           if (savedSize) {
+               changeFontSize(savedSize);
+               document.getElementById('font-size-selector').value = savedSize;
+           }
 
-            saveData();
-        }
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            changeTheme(savedTheme);
+            document.getElementById('theme-selector').value = savedTheme;
+
+           saveData();
+       }
 
         function initializeNotifications() {
             if ('Notification' in window && Notification.permission !== 'granted') {
@@ -694,7 +740,10 @@
             document.getElementById('exam-date-display').textContent = studyData.examDate;
             document.getElementById('overall-progress').textContent = studyData.overallProgress + '%';
             document.getElementById('progress-bar').style.width = studyData.overallProgress + '%';
-            document.getElementById('predicted-score').textContent = calculatePredictedScore();
+            const scores = calculatePredictedScores();
+            document.getElementById('pred-m1').textContent = scores.morning1;
+            document.getElementById('pred-m2').textContent = scores.morning2;
+            document.getElementById('pred-af').textContent = scores.afternoon;
             document.getElementById('total-study-time').textContent = studyData.totalStudyTime + '時間';
             document.getElementById('completed-areas').textContent = studyData.completedAreas + '/8';
             document.getElementById('accuracy-rate').textContent = studyData.accuracyRate + '%';
@@ -1033,8 +1082,12 @@
         }
 
         function updatePredictionTab() {
+            const scores = calculatePredictedScores();
             const predictedScore = calculatePredictedScore();
             document.getElementById('prediction-score').textContent = predictedScore;
+            document.getElementById('pred-detail-m1').textContent = scores.morning1;
+            document.getElementById('pred-detail-m2').textContent = scores.morning2;
+            document.getElementById('pred-detail-af').textContent = scores.afternoon;
             
             const status = predictedScore >= 70 ? '合格可能性: 高' : 
                           predictedScore >= 60 ? '合格可能性: 中' : '合格可能性: 低';
@@ -1103,7 +1156,7 @@
             `).join('');
         }
 
-        function calculatePredictedScore() {
+        function calculatePredictedScores() {
             const baseScore = 50;
             const progressBonus = studyData.overallProgress * 0.3;
             const accuracyBonus = studyData.accuracyRate * 0.2;
@@ -1112,10 +1165,19 @@
                 'intermediate': 1.2,
                 'advanced': 1.4
             };
-            
-            return Math.min(100, Math.round(
-                (baseScore + progressBonus + accuracyBonus) * levelMultiplier[studyData.currentLevel]
-            ));
+
+            const base = (baseScore + progressBonus + accuracyBonus) * levelMultiplier[studyData.currentLevel];
+
+            return {
+                morning1: Math.min(100, Math.round(base - 5)),
+                morning2: Math.min(100, Math.round(base)),
+                afternoon: Math.min(100, Math.round(base - 10))
+            };
+        }
+
+        function calculatePredictedScore() {
+            const scores = calculatePredictedScores();
+            return Math.round((scores.morning1 + scores.morning2 + scores.afternoon) / 3);
         }
 
         function startStudySession() {
@@ -1346,6 +1408,12 @@ https://appadaycreator.github.io/sc-seclab
         function changeFontSize(size) {
             document.documentElement.style.fontSize = size + 'px';
             localStorage.setItem('fontSize', size);
+        }
+
+        function changeTheme(theme) {
+            document.body.classList.remove('theme-dark', 'theme-light');
+            document.body.classList.add(theme === 'light' ? 'theme-light' : 'theme-dark');
+            localStorage.setItem('theme', theme);
         }
 
         // Auto-save functionality
