@@ -5,6 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>使い方 - SC-SecLab</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body.theme-light {
+            background-color: #ffffff;
+            color: #333333;
+        }
+
+        body.theme-light .bg-gray-800 {
+            background-color: #f3f4f6;
+            color: #333333;
+        }
+
+        body.theme-light .bg-gray-900 {
+            background-color: #ffffff;
+        }
+
+        body.theme-light .text-gray-200 {
+            color: #333333;
+        }
+
+        body.theme-light .text-gray-400 {
+            color: #555555;
+        }
+    </style>
 </head>
 <body class="bg-gray-900 text-gray-200 p-6">
     <header class="mb-8 text-center">
@@ -57,5 +80,11 @@
     <footer class="mt-10 text-sm text-center text-gray-400">
         <a href="index.html" class="text-blue-400 hover:underline">トップへ戻る</a>
     </footer>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.body.classList.add(savedTheme === 'light' ? 'theme-light' : 'theme-dark');
+        });
+    </script>
 </body>
 </html>
