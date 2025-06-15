@@ -666,6 +666,19 @@
         </div>
     </div>
 
+    <!-- Plan Detail Modal -->
+    <div id="plan-detail-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="glassmorphism rounded-xl p-6 max-w-md w-full mx-4">
+            <h3 class="text-lg font-bold mb-4">学習プラン詳細</h3>
+            <div id="plan-detail-content" class="space-y-2 text-sm"></div>
+            <label class="flex items-center mt-4">
+                <input type="checkbox" id="plan-completed" class="mr-2">
+                <span>この日の学習を完了</span>
+            </label>
+            <button onclick="closePlanDetail()" class="w-full mt-4 p-3 bg-gray-700 hover:bg-gray-600 rounded-lg font-semibold transition-colors">閉じる</button>
+        </div>
+    </div>
+
     <!-- Footer -->
     <footer class="glassmorphism mt-12">
         <div class="container mx-auto px-4 py-8">
@@ -1043,10 +1056,7 @@
 
         function selectDate(dateKey) {
             if (studyData.studyPlan[dateKey]) {
-                studyData.completedDays[dateKey] = !studyData.completedDays[dateKey];
-                saveData();
-                renderCalendar();
-                updateGoalDisplay();
+                openPlanDetail(dateKey);
             }
         }
 
@@ -1466,16 +1476,44 @@
         function showNotification(message, type = 'info') {
             const notification = document.createElement('div');
             notification.className = `notification fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${
-                type === 'success' ? 'bg-green-600' : 
+                type === 'success' ? 'bg-green-600' :
                 type === 'error' ? 'bg-red-600' : 'bg-blue-600'
             } text-white`;
             notification.textContent = message;
-            
+
             document.body.appendChild(notification);
-            
+
             setTimeout(() => {
                 notification.remove();
             }, 3000);
+        }
+
+        function openPlanDetail(dateKey) {
+            const plan = studyData.studyPlan[dateKey];
+            if (!plan) return;
+            const container = document.getElementById('plan-detail-content');
+            container.innerHTML = `
+                <div><strong>日付:</strong> ${dateKey}</div>
+                <div><strong>学習分野:</strong> ${plan.area}</div>
+                <div><strong>学習時間:</strong> ${plan.duration}時間</div>
+                <div class="mt-2"><strong>タスク:</strong></div>
+                <ul class="list-disc ml-5">${plan.tasks.map(t => `<li>${t}</li>`).join('')}</ul>
+            `;
+            const checkbox = document.getElementById('plan-completed');
+            checkbox.checked = !!studyData.completedDays[dateKey];
+            checkbox.onchange = function() {
+                studyData.completedDays[dateKey] = this.checked;
+                saveData();
+                renderCalendar();
+                updateGoalDisplay();
+            };
+            document.getElementById('plan-detail-modal').classList.remove('hidden');
+            document.getElementById('plan-detail-modal').classList.add('flex');
+        }
+
+        function closePlanDetail() {
+            document.getElementById('plan-detail-modal').classList.add('hidden');
+            document.getElementById('plan-detail-modal').classList.remove('flex');
         }
 
         // Share functions
