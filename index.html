@@ -615,6 +615,14 @@
                     <span class="text-sm">試験前アラート</span>
                     <input type="checkbox" id="settings-exam-alert" class="toggle">
                 </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">総合正答率(%)</label>
+                    <input type="number" id="settings-overall-accuracy" min="0" max="100" class="w-full p-3 bg-gray-800 rounded-lg border border-gray-600 focus:border-blue-400 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">分野別正答率</label>
+                    <div id="settings-area-accuracy" class="space-y-2"></div>
+                </div>
                 <button type="submit" class="w-full btn-primary py-3 rounded-lg font-semibold">保存</button>
             </form>
             <button onclick="closeSettings()" class="w-full mt-4 p-3 bg-gray-700 hover:bg-gray-600 rounded-lg font-semibold transition-colors">閉じる</button>
@@ -706,6 +714,18 @@
     <script>
         // Global variables
         let currentDate = new Date();
+        const studyAreas = [
+            'セキュリティ基礎',
+            '暗号化技術',
+            'ネットワークセキュリティ',
+            'アプリケーションセキュリティ',
+            'システムセキュリティ',
+            'セキュリティマネジメント',
+            '法制度・ガイドライン',
+            '午後問題対策'
+        ];
+        const defaultAreaAccuracies = {};
+        studyAreas.forEach(area => { defaultAreaAccuracies[area] = 0; });
         const practiceQuestions = [
             {
                 year: '2023年春期',
@@ -741,11 +761,16 @@
             currentLevel: 'beginner',
             practiceScores: [],
             weakAreas: [],
+            areaAccuracies: defaultAreaAccuracies,
             studyPlan: {},
             goals: { monthly: {}, weekly: {}, daily: {} },
             completedDays: {},
             lastStudyDate: null
         };
+
+        if (!studyData.areaAccuracies) {
+            studyData.areaAccuracies = JSON.parse(JSON.stringify(defaultAreaAccuracies));
+        }
 
         // Initialize app
         document.addEventListener('DOMContentLoaded', function() {
@@ -822,8 +847,21 @@
             document.getElementById('total-study-time').textContent = studyData.totalStudyTime + '時間';
             document.getElementById('completed-areas').textContent = studyData.completedAreas + '/8';
             document.getElementById('accuracy-rate').textContent = studyData.accuracyRate + '%';
-            
+
+            updateAreaAccuracyDisplay();
+
             updateTodayTasks();
+        }
+
+        function updateAreaAccuracyDisplay() {
+            const container = document.getElementById('area-accuracy');
+            if (!container) return;
+            container.innerHTML = studyAreas.map(area => `
+                <div class="flex justify-between">
+                    <span class="text-gray-400">${area}</span>
+                    <span class="font-bold">${studyData.areaAccuracies[area] || 0}%</span>
+                </div>
+            `).join('');
         }
 
         function updateTodayTasks() {
@@ -1028,16 +1066,7 @@
             const today = new Date();
             const daysUntilExam = Math.ceil((exam - today) / (1000 * 60 * 60 * 24));
             
-            const studyAreas = [
-                'セキュリティ基礎',
-                '暗号化技術',
-                'ネットワークセキュリティ',
-                'アプリケーションセキュリティ',
-                'システムセキュリティ',
-                'セキュリティマネジメント',
-                '法制度・ガイドライン',
-                '午後問題対策'
-            ];
+
             
             // Create daily study plan
             studyData.studyPlan = {};
@@ -1390,6 +1419,14 @@
             document.getElementById('settings-daily-reminder').checked = document.getElementById('daily-reminder').checked;
             document.getElementById('settings-weekly-review').checked = document.getElementById('weekly-review').checked;
             document.getElementById('settings-exam-alert').checked = document.getElementById('exam-alert').checked;
+            document.getElementById('settings-overall-accuracy').value = studyData.accuracyRate;
+            const areaContainer = document.getElementById('settings-area-accuracy');
+            areaContainer.innerHTML = studyAreas.map(area => `
+                <div class="flex items-center justify-between">
+                    <span class="text-sm">${area}</span>
+                    <input type="number" data-area="${area}" min="0" max="100" value="${studyData.areaAccuracies[area] || 0}" class="w-20 p-2 bg-gray-800 rounded-lg border border-gray-600 focus:border-blue-400 focus:outline-none">
+                </div>
+            `).join('');
 
             hideGuide();
 
@@ -1415,7 +1452,13 @@
             document.getElementById('daily-reminder').checked = document.getElementById('settings-daily-reminder').checked;
             document.getElementById('weekly-review').checked = document.getElementById('settings-weekly-review').checked;
             document.getElementById('exam-alert').checked = document.getElementById('settings-exam-alert').checked;
+            studyData.accuracyRate = parseInt(document.getElementById('settings-overall-accuracy').value) || 0;
+            document.querySelectorAll('#settings-area-accuracy input[data-area]').forEach(input => {
+                const area = input.getAttribute('data-area');
+                studyData.areaAccuracies[area] = parseInt(input.value) || 0;
+            });
             saveData();
+            updateDashboard();
             closeSettings();
             showNotification('設定を保存しました', 'success');
         }
