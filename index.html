@@ -248,9 +248,6 @@
             <button class="tab-button px-6 py-3 rounded-lg font-semibold whitespace-nowrap" onclick="showTab('plan')">
                 <i class="fas fa-calendar-alt mr-2"></i>学習プラン
             </button>
-            <button class="tab-button px-6 py-3 rounded-lg font-semibold whitespace-nowrap" onclick="showTab('analysis')">
-                <i class="fas fa-chart-line mr-2"></i>弱点分析
-            </button>
             <button class="tab-button px-6 py-3 rounded-lg font-semibold whitespace-nowrap" onclick="showTab('prediction')">
                 <i class="fas fa-target mr-2"></i>合格予測
             </button>
@@ -435,33 +432,6 @@
         </div>
 
 
-        <!-- Analysis Tab -->
-        <div id="analysis" class="tab-content">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div class="glassmorphism rounded-xl p-6">
-                    <h2 class="text-xl font-bold mb-6 flex items-center">
-                        <i class="fas fa-exclamation-triangle mr-3 text-red-400"></i>
-                        弱点分析
-                    </h2>
-                    <canvas id="weakness-chart" style="height: 250px; max-width: 100%;"></canvas>
-                </div>
-
-                <div class="glassmorphism rounded-xl p-6">
-                    <h2 class="text-xl font-bold mb-6 flex items-center">
-                        <i class="fas fa-chart-line mr-3 text-green-400"></i>
-                        学習進捗
-                    </h2>
-                    <canvas id="progress-chart" style="height: 300px;"></canvas>
-                </div>
-
-                <div class="lg:col-span-2 glassmorphism rounded-xl p-6">
-                    <h3 class="text-lg font-bold mb-4">推奨学習アクション</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="recommended-actions">
-                        <!-- Recommendations will be populated here -->
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <!-- Prediction Tab -->
         <div id="prediction" class="tab-content">
@@ -923,8 +893,6 @@
             // Update specific tab content
             if (tabName === 'plan') {
                 renderCalendar();
-            } else if (tabName === 'analysis') {
-                updateAnalysisCharts();
             } else if (tabName === 'prediction') {
                 updatePredictionTab();
             }
@@ -1113,93 +1081,6 @@
             }
         }
 
-        function updateAnalysisCharts() {
-            // Weakness Chart
-            const weaknessCtx = document.getElementById('weakness-chart');
-            if (weaknessCtx) {
-                new Chart(weaknessCtx, {
-                    type: 'radar',
-                    data: {
-                        labels: ['セキュリティ基礎', '暗号化', 'ネットワーク', 'アプリ', 'システム', 'マネジメント', '法制度', '午後対策'],
-                        datasets: [{
-                            label: '習熟度',
-                            data: [65, 45, 70, 55, 60, 50, 40, 35],
-                            borderColor: '#00d4ff',
-                            backgroundColor: 'rgba(0, 212, 255, 0.2)',
-                            pointBackgroundColor: '#00d4ff'
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: true,
-                        plugins: {
-                            legend: {
-                                labels: { color: '#e1e8ed' }
-                            }
-                        },
-                        scales: {
-                            r: {
-                                beginAtZero: true,
-                                max: 100,
-                                ticks: { color: '#8b949e' },
-                                grid: { color: '#374151' },
-                                pointLabels: { color: '#8b949e' }
-                            }
-                        }
-                    }
-                });
-            }
-            
-            // Progress Chart
-            const progressCtx = document.getElementById('progress-chart');
-            if (progressCtx) {
-                new Chart(progressCtx, {
-                    type: 'bar',
-                    data: {
-                        labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
-                        datasets: [{
-                            label: '学習時間',
-                            data: [12, 15, 18, 14],
-                            backgroundColor: '#00d4ff'
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: true,
-                        plugins: {
-                            legend: {
-                                labels: { color: '#e1e8ed' }
-                            }
-                        },
-                        scales: {
-                            x: { ticks: { color: '#8b949e' }, grid: { color: '#374151' } },
-                            y: { ticks: { color: '#8b949e' }, grid: { color: '#374151' } }
-                        }
-                    }
-                });
-            }
-            
-            // Update recommended actions
-            const recommendations = [
-                { title: '午後問題対策を強化', description: '記述問題の練習を増やしましょう', priority: 'high' },
-                { title: '暗号化技術の復習', description: '基礎理論の理解を深めましょう', priority: 'medium' },
-                { title: '法制度の暗記', description: '重要な法律・ガイドラインを覚えましょう', priority: 'medium' },
-                { title: '模擬試験の実施', description: '本番形式での練習を行いましょう', priority: 'high' }
-            ];
-            
-            const actionsContainer = document.getElementById('recommended-actions');
-            actionsContainer.innerHTML = recommendations.map(rec => `
-                <div class="weak-area p-4 rounded-lg">
-                    <div class="flex items-center justify-between mb-2">
-                        <h4 class="font-semibold">${rec.title}</h4>
-                        <span class="px-2 py-1 text-xs rounded ${rec.priority === 'high' ? 'bg-red-600' : 'bg-yellow-600'} text-white">
-                            ${rec.priority === 'high' ? '緊急' : '重要'}
-                        </span>
-                    </div>
-                    <p class="text-sm text-gray-400">${rec.description}</p>
-                </div>
-            `).join('');
-        }
 
         function updatePredictionTab() {
             const scores = calculatePredictedScores();
@@ -1324,7 +1205,6 @@
         }
 
         function reviewWeakAreas() {
-            showTab('analysis');
             showNotification('弱点分野の確認を行います！', 'info');
         }
 
