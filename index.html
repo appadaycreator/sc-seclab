@@ -337,6 +337,9 @@
                             <button class="w-full bg-gray-700 hover:bg-gray-600 py-3 rounded-lg font-semibold transition-colors" title="苦手分野を復習" onclick="reviewWeakAreas()">
                                 <i class="fas fa-exclamation-triangle mr-2"></i>弱点復習
                             </button>
+                            <button class="w-full bg-gray-700 hover:bg-gray-600 py-3 rounded-lg font-semibold transition-colors" title="正答率を記録" onclick="showAccuracyModal()">
+                                <i class="fas fa-chart-line mr-2"></i>正答率記録
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -524,14 +527,6 @@
                     <input type="date" id="settings-exam-date" class="w-full p-3 bg-gray-800 rounded-lg border border-gray-600 focus:border-blue-400 focus:outline-none">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium mb-2">現在のレベル</label>
-                    <select id="settings-current-level" class="w-full p-3 bg-gray-800 rounded-lg border border-gray-600 focus:border-blue-400 focus:outline-none">
-                        <option value="beginner">初心者</option>
-                        <option value="intermediate">中級者</option>
-                        <option value="advanced">上級者</option>
-                    </select>
-                </div>
-                <div>
                     <label class="block text-sm font-medium mb-2">1日の学習時間（時間）</label>
                     <input type="number" id="settings-daily-hours" min="0.5" max="8" step="0.5" class="w-full p-3 bg-gray-800 rounded-lg border border-gray-600 focus:border-blue-400 focus:outline-none">
                 </div>
@@ -546,14 +541,6 @@
                 <div class="flex items-center justify-between">
                     <span class="text-sm">試験前アラート</span>
                     <input type="checkbox" id="settings-exam-alert" class="toggle">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium mb-2">総合正答率(%)</label>
-                    <input type="number" id="settings-overall-accuracy" min="0" max="100" class="w-full p-3 bg-gray-800 rounded-lg border border-gray-600 focus:border-blue-400 focus:outline-none">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium mb-2">分野別正答率</label>
-                    <div id="settings-area-accuracy" class="space-y-2"></div>
                 </div>
                 <button type="submit" class="w-full btn-primary py-3 rounded-lg font-semibold">保存</button>
             </form>
@@ -588,7 +575,7 @@
             <h3 class="text-lg font-bold mb-4">使い方</h3>
             <div class="space-y-4 text-sm">
                 <p>SC-SecLabは情報処理安全確保支援士試験の学習を総合的にサポートするプラットフォームです。</p>
-                <p>1. <strong>初期設定</strong>: 設定ボタンから試験日や現在のレベルを登録します。</p>
+                <p>1. <strong>初期設定</strong>: 設定ボタンから試験日と学習時間、通知を設定します。</p>
                 <p>2. <strong>学習プラン</strong>: 「学習プラン」タブで自動生成されたスケジュールを確認し、毎日のタスクを実行します。</p>
                 <p>3. <strong>弱点分析</strong>: 学習履歴から苦手分野を分析し、重点的に復習しましょう。</p>
                 <p>4. <strong>合格予測</strong>: 進捗データを基に合格可能性をチェックできます。</p>
@@ -607,6 +594,25 @@
                 <span>この日の学習を完了</span>
             </label>
             <button onclick="closePlanDetail()" class="w-full mt-4 p-3 bg-gray-700 hover:bg-gray-600 rounded-lg font-semibold transition-colors">閉じる</button>
+        </div>
+    </div>
+
+    <!-- Accuracy Modal -->
+    <div id="accuracy-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="glassmorphism rounded-xl p-6 max-w-md w-full mx-4">
+            <h3 class="text-lg font-bold mb-4">正答率記録</h3>
+            <form id="accuracy-form" class="space-y-4" onsubmit="saveAccuracy(event)">
+                <div>
+                    <label class="block text-sm font-medium mb-2">日付</label>
+                    <input type="date" id="accuracy-date" class="w-full p-3 bg-gray-800 rounded-lg border border-gray-600 focus:border-blue-400 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">正答率(%)</label>
+                    <input type="number" id="accuracy-value" min="0" max="100" class="w-full p-3 bg-gray-800 rounded-lg border border-gray-600 focus:border-blue-400 focus:outline-none">
+                </div>
+                <button type="submit" class="w-full btn-primary py-3 rounded-lg font-semibold">保存</button>
+            </form>
+            <button onclick="closeAccuracyModal()" class="w-full mt-4 p-3 bg-gray-700 hover:bg-gray-600 rounded-lg font-semibold transition-colors">閉じる</button>
         </div>
     </div>
 
@@ -704,6 +710,7 @@
             practiceScores: [],
             weakAreas: [],
             areaAccuracies: defaultAreaAccuracies,
+            accuracyRecords: [],
             studyPlan: {},
             goals: { monthly: {}, weekly: {}, daily: {} },
             completedDays: {},
@@ -712,6 +719,9 @@
 
         if (!studyData.areaAccuracies) {
             studyData.areaAccuracies = JSON.parse(JSON.stringify(defaultAreaAccuracies));
+        }
+        if (!studyData.accuracyRecords) {
+            studyData.accuracyRecords = [];
         }
 
         // Initialize app
@@ -788,6 +798,10 @@
             document.getElementById('pred-af').textContent = scores.afternoon;
             document.getElementById('total-study-time').textContent = studyData.totalStudyTime + '時間';
             document.getElementById('completed-areas').textContent = studyData.completedAreas + '/8';
+            if (studyData.accuracyRecords.length > 0) {
+                const sum = studyData.accuracyRecords.reduce((t, r) => t + r.accuracy, 0);
+                studyData.accuracyRate = Math.round(sum / studyData.accuracyRecords.length);
+            }
             document.getElementById('accuracy-rate').textContent = studyData.accuracyRate + '%';
 
             updateAreaAccuracyDisplay();
@@ -1256,18 +1270,10 @@
         function showSettings() {
             document.getElementById('settings-exam-date').value = studyData.examDate;
             document.getElementById('settings-daily-hours').value = studyData.dailyHours;
-            document.getElementById('settings-current-level').value = studyData.currentLevel;
             document.getElementById('settings-daily-reminder').checked = document.getElementById('daily-reminder').checked;
             document.getElementById('settings-weekly-review').checked = document.getElementById('weekly-review').checked;
             document.getElementById('settings-exam-alert').checked = document.getElementById('exam-alert').checked;
-            document.getElementById('settings-overall-accuracy').value = studyData.accuracyRate;
-            const areaContainer = document.getElementById('settings-area-accuracy');
-            areaContainer.innerHTML = studyAreas.map(area => `
-                <div class="flex items-center justify-between">
-                    <span class="text-sm">${area}</span>
-                    <input type="number" data-area="${area}" min="0" max="100" value="${studyData.areaAccuracies[area] || 0}" class="w-20 p-2 bg-gray-800 rounded-lg border border-gray-600 focus:border-blue-400 focus:outline-none">
-                </div>
-            `).join('');
+            // レベルや正答率の設定は別フォームで管理
 
             hideGuide();
 
@@ -1276,7 +1282,7 @@
         }
 
         function showHelp() {
-            const msg = 'まず「設定」ボタンから試験日・学習時間・レベルを入力しましょう。';
+            const msg = 'まず「設定」ボタンから試験日と学習時間、通知設定を行いましょう。';
             showNotification(msg, 'info');
         }
 
@@ -1289,15 +1295,10 @@
             event.preventDefault();
             studyData.examDate = document.getElementById('settings-exam-date').value;
             studyData.dailyHours = parseFloat(document.getElementById('settings-daily-hours').value);
-            studyData.currentLevel = document.getElementById('settings-current-level').value;
             document.getElementById('daily-reminder').checked = document.getElementById('settings-daily-reminder').checked;
             document.getElementById('weekly-review').checked = document.getElementById('settings-weekly-review').checked;
             document.getElementById('exam-alert').checked = document.getElementById('settings-exam-alert').checked;
-            studyData.accuracyRate = parseInt(document.getElementById('settings-overall-accuracy').value) || 0;
-            document.querySelectorAll('#settings-area-accuracy input[data-area]').forEach(input => {
-                const area = input.getAttribute('data-area');
-                studyData.areaAccuracies[area] = parseInt(input.value) || 0;
-            });
+            // 正答率やレベルの更新は別フォームで実施
             saveData();
             updateDashboard();
             closeSettings();
@@ -1356,6 +1357,29 @@
         function closeShareModal() {
             document.getElementById('share-modal').classList.add('hidden');
             document.getElementById('share-modal').classList.remove('flex');
+        }
+
+        function showAccuracyModal() {
+            document.getElementById('accuracy-date').value = new Date().toISOString().split('T')[0];
+            document.getElementById('accuracy-value').value = studyData.accuracyRate || 0;
+            document.getElementById('accuracy-modal').classList.remove('hidden');
+            document.getElementById('accuracy-modal').classList.add('flex');
+        }
+
+        function closeAccuracyModal() {
+            document.getElementById('accuracy-modal').classList.add('hidden');
+            document.getElementById('accuracy-modal').classList.remove('flex');
+        }
+
+        function saveAccuracy(event) {
+            event.preventDefault();
+            const date = document.getElementById('accuracy-date').value;
+            const value = parseInt(document.getElementById('accuracy-value').value) || 0;
+            studyData.accuracyRecords.push({ date: date, accuracy: value });
+            saveData();
+            updateDashboard();
+            closeAccuracyModal();
+            showNotification('正答率を保存しました', 'success');
         }
 
         function shareToX() {
